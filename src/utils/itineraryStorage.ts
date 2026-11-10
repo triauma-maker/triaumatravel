@@ -30,9 +30,9 @@ export interface ReservationContactSettings {
 }
 
 export const defaultContactSettings: ReservationContactSettings = {
-  whatsappNumber: "6281234567890",
-  reservationEmail: "reservation@triauma.com",
-  companyName: "Tria Uma Luxury Travel Collection",
+  whatsappNumber: "+62817561165",
+  reservationEmail: "sugita.mr@gmail.com",
+  companyName: "Tria Uma Travel Collection",
 };
 
 export interface AdminElementsStore {

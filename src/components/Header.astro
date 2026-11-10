@@ -12,17 +12,17 @@ const links = [
          bg-forest/[0.60] text-white shadow-lg shadow-black/5
          backdrop-blur-md"
 >
-  <div class="container-editorial flex items-center justify-between gap-6 py-5">
+  <div class="container-editorial flex min-w-0 items-center justify-between gap-2 py-3 sm:gap-6 sm:py-5">
 
     <!-- Logo -->
-    <a href="/" class="shrink-0 flex items-center gap-3.5" aria-label="Tria Uma home">
+    <a href="/" class="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-3.5" aria-label="Tria Uma home">
       <!-- Logo image in white circle with gold ring -->
       <div class="relative shrink-0">
-        <div class="h-15 w-15 rounded-full bg-white shadow-lg ring-2 ring-[#a78a63]/60 flex items-center justify-center overflow-hidden">
+        <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white shadow-lg ring-2 ring-[#a78a63]/60 sm:h-15 sm:w-15">
           <img
             src="/tria-uma-logo.png"
             alt="Tria Uma Logo"
-            class="h-14 w-14 object-contain"
+            class="h-11 w-11 object-contain sm:h-14 sm:w-14"
             loading="eager"
           />
         </div>
@@ -31,10 +31,10 @@ const links = [
       </div>
       <!-- Brand name + tagline -->
       <div>
-        <span class="font-display text-3xl font-bold tracking-[0.16em] block drop-shadow-sm">
+        <span class="block whitespace-nowrap font-display text-2xl font-bold tracking-[0.1em] drop-shadow-sm sm:text-3xl sm:tracking-[0.16em]">
           TRIA UMA
         </span>
-        <span class="mt-0.5 block text-[9px] font-bold tracking-[0.28em] text-white/80 brand-tagline">
+        <span class="brand-tagline mt-0.5 block whitespace-nowrap text-[7px] font-bold tracking-[0.16em] text-white/80 sm:text-[9px] sm:tracking-[0.28em]">
           SIMPLE, QUALITY &amp; SATISFACTION
         </span>
       </div>
@@ -57,7 +57,7 @@ const links = [
     </nav>
 
     <!-- Header Actions -->
-    <div class="flex items-center gap-3">
+    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
       <!-- Profile / Saved Itineraries link -->
       <a
         href="/profile/"
@@ -86,7 +86,7 @@ const links = [
       <button
         id="menu-toggle"
         type="button"
-        class="inline-flex h-10 w-10 items-center justify-center
+        class="inline-flex h-10 w-10 shrink-0 items-center justify-center
                border border-white/60 xl:hidden"
         aria-label="Open navigation menu"
         aria-expanded="false"

@@ -7,7 +7,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   description="Create your personalized luxury travel itinerary with custom day-to-day programs, hotels, activities, private vehicles, and bespoke services."
 >
   <!-- Hero Section -->
-  <section class="relative bg-forest text-white pt-36 pb-20 overflow-hidden border-b border-white/10">
+  <section class="planner-hero relative bg-forest text-white pt-24 pb-10 sm:pt-36 sm:pb-20 overflow-hidden border-b border-white/10">
     <div class="absolute inset-0 opacity-20 pointer-events-none">
       <img
         src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
@@ -24,21 +24,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <h1 class="editorial-title text-4xl sm:text-6xl md:text-7xl max-w-3xl">
             Design your tailor-made journey.
           </h1>
-          <p class="text-white/70 max-w-2xl text-xs sm:text-sm mt-4 leading-relaxed">
-            Craft every detail of your holiday. Select your preferred luxury stays, curated experiences, dedicated private vehicle, and personalized services. Once completed, you can save it to your profile, generate a bespoke PDF, or submit it directly to our reservation team for a personalized quotation.
+          <p class="text-white/70 max-w-2xl text-sm mt-3 sm:mt-4 leading-relaxed">
+            Build your itinerary with stays, experiences, and private services. Save it, print it, or send it to our reservation team for a personalized quotation.
           </p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
           <a
             href="/profile/"
-            class="border border-white/30 text-white/80 hover:border-white hover:text-white px-4 py-2.5 text-[11px] tracking-widest uppercase transition-colors inline-flex items-center gap-2"
+            class="border border-white/30 text-white/80 hover:border-white hover:text-white px-3 sm:px-4 py-2.5 text-[10px] sm:text-[11px] tracking-wider sm:tracking-widest uppercase transition-colors inline-flex items-center gap-2"
           >
             <span>MY SAVED TRIPS</span>
             <span>👤</span>
           </a>
           <a
             href="/admin/"
-            class="border border-gold/40 text-gold hover:bg-gold hover:text-forest px-4 py-2.5 text-[11px] tracking-widest uppercase transition-colors text-[10px]"
+            class="border border-gold/40 text-gold hover:bg-gold hover:text-forest px-3 sm:px-4 py-2.5 text-[10px] tracking-wider sm:tracking-widest uppercase transition-colors"
             title="Manage elements in Admin Dashboard"
           >
             ⚙ ADMIN
@@ -49,23 +49,26 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   </section>
 
   <!-- Interactive Planner App -->
-  <section class="container-editorial py-12 md:py-20" id="planner-section">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+  <section class="container-editorial py-6 sm:py-12 md:py-20" id="planner-section">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
 
       <!-- LEFT COLUMN: BUILDER FORM (8 cols) -->
-      <div class="lg:col-span-7 xl:col-span-8 space-y-12">
+      <div class="lg:col-span-7 xl:col-span-8 space-y-4 sm:space-y-12">
 
         <!-- STEP 1: JOURNEY OVERVIEW & GUEST DETAILS -->
-        <div class="bg-white border border-forest/15 p-6 md:p-8 shadow-sm">
-          <div class="flex items-center justify-between border-b border-forest/10 pb-4 mb-6">
+        <details data-planner-step="1" class="planner-step bg-white border border-forest/15 p-4 sm:p-6 md:p-8 shadow-sm" open>
+          <summary class="planner-step-summary flex items-center justify-between border-b border-forest/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
             <div>
               <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STEP 1 OF 3</span>
               <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Journey & Guest Details</h2>
             </div>
-            <span class="text-xs text-stone-400 font-mono">01</span>
-          </div>
+            <span class="flex items-center gap-2 text-xs text-stone-400 font-mono">
+              01
+              <span class="step-chevron text-lg leading-none sm:hidden" aria-hidden="true">⌄</span>
+            </span>
+          </summary>
 
-          <div class="space-y-6">
+          <div class="space-y-4 sm:space-y-6">
             <!-- Itinerary Title -->
             <div>
               <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
@@ -208,17 +211,20 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               </div>
             </div>
           </div>
-        </div>
+        </details>
 
         <!-- STEP 2: CHAUFFEUR VEHICLE & ESSENTIAL SERVICES -->
-        <div class="bg-white border border-forest/15 p-6 md:p-8 shadow-sm">
-          <div class="flex items-center justify-between border-b border-forest/10 pb-4 mb-6">
+        <details data-planner-step="2" class="planner-step bg-white border border-forest/15 p-4 sm:p-6 md:p-8 shadow-sm" open>
+          <summary class="planner-step-summary flex items-center justify-between border-b border-forest/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
             <div>
               <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STEP 2 OF 3</span>
               <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Vehicle & Essential Services</h2>
             </div>
-            <span class="text-xs text-stone-400 font-mono">02</span>
-          </div>
+            <span class="flex items-center gap-2 text-xs text-stone-400 font-mono">
+              02
+              <span class="step-chevron text-lg leading-none sm:hidden" aria-hidden="true">⌄</span>
+            </span>
+          </summary>
 
           <!-- Vehicle Selection Grid -->
           <div class="mb-8">
@@ -245,19 +251,23 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               <!-- Dynamically populated from admin elements -->
             </div>
           </div>
-        </div>
+        </details>
 
         <!-- STEP 3: DAY-TO-DAY PROGRAM BUILDER -->
-        <div class="bg-white border border-forest/15 p-6 md:p-8 shadow-sm">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-forest/10 pb-4 mb-6">
+        <details data-planner-step="3" class="planner-step bg-white border border-forest/15 p-4 sm:p-6 md:p-8 shadow-sm md:relative" open>
+          <summary class="planner-step-summary flex items-center justify-between gap-3 border-b border-forest/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
             <div>
               <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STEP 3 OF 3</span>
               <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Day-to-Day Program</h2>
             </div>
+            <span class="step-chevron text-lg leading-none sm:hidden" aria-hidden="true">⌄</span>
+          </summary>
+
+          <div class="flex justify-start sm:justify-end mb-4 md:absolute md:right-8 md:top-8 md:mb-0">
             <button
               type="button"
               id="btn-autofill-suggestions"
-              class="text-[10px] tracking-widest uppercase border border-gold text-gold hover:bg-gold hover:text-forest px-3.5 py-2 transition-colors inline-flex items-center gap-1.5 self-start"
+              class="text-[10px] tracking-widest uppercase border border-gold text-gold hover:bg-gold hover:text-forest px-3.5 py-2 transition-colors inline-flex items-center gap-1.5"
             >
               <span>✨ AUTO-FILL SUGGESTED PROGRAM</span>
             </button>
@@ -271,7 +281,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </div>
 
           <!-- Active Day Details Editor -->
-          <div id="active-day-editor" class="space-y-6 bg-ivory p-6 border border-forest/15">
+          <div id="active-day-editor" class="space-y-4 sm:space-y-6 bg-ivory p-3 sm:p-6 border border-forest/15">
             <!-- Day Header & Title -->
             <div class="flex items-center justify-between gap-4">
               <span id="active-day-badge" class="font-display text-2xl text-forest font-medium">Day 1</span>
@@ -340,13 +350,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               ></textarea>
             </div>
           </div>
-        </div>
+        </details>
 
       </div>
 
       <!-- RIGHT COLUMN: ITINERARY SUMMARY CARD (4/5 cols) -->
       <div class="lg:col-span-5 xl:col-span-4">
-        <div class="sticky top-28 space-y-6">
+        <div class="sticky top-28 space-y-4 sm:space-y-6">
 
           <!-- LIVE SUMMARY CARD -->
           <div class="bg-forest text-white p-6 md:p-8 shadow-xl border border-white/10">
@@ -446,8 +456,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   </section>
 
   <!-- SUBMISSION CONFIRMATION MODAL -->
-  <div id="submit-modal" class="fixed inset-0 z-[99999] bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-ivory border border-forest/20 shadow-2xl max-w-lg w-full p-6 md:p-8 relative text-center">
+  <div id="submit-modal" class="fixed inset-0 z-[99999] bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+    <div class="bg-ivory border border-forest/20 shadow-2xl max-w-lg w-full p-4 sm:p-6 md:p-8 relative text-center">
       <div class="w-14 h-14 mx-auto rounded-full bg-forest text-gold flex items-center justify-center text-2xl mb-4">
         ✓
       </div>
@@ -527,6 +537,96 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <style>
+  .planner-step > summary {
+    list-style: none;
+  }
+
+  .planner-step > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .planner-step > summary {
+      pointer-events: none;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .planner-hero .editorial-title {
+      font-size: clamp(2.25rem, 10vw, 2.75rem);
+    }
+
+    .planner-hero a,
+    #btn-autofill-suggestions {
+      min-height: 44px;
+    }
+
+    .planner-step > summary {
+      cursor: pointer;
+    }
+
+    .planner-step > summary:focus-visible {
+      outline-offset: 6px;
+    }
+
+    .planner-step[open] .step-chevron {
+      transform: rotate(180deg);
+    }
+
+    #planner-section :global(input:not([type="checkbox"])),
+    #planner-section :global(select),
+    #planner-section :global(textarea) {
+      min-height: 44px;
+      font-size: 16px;
+    }
+
+    #planner-section :global(label) {
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      line-height: 1.45;
+    }
+
+    #planner-section :global(input[type="checkbox"]) {
+      width: 20px;
+      height: 20px;
+      flex: none;
+    }
+
+    #btn-duration-minus,
+    #btn-duration-plus,
+    #day-tabs-nav :global(button) {
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    #vehicles-container {
+      gap: 0.625rem;
+    }
+
+    #vehicles-container :global(p),
+    #services-container :global(label > div > span:last-child),
+    #day-activities-container :global(label > div > span:last-child) {
+      font-size: 12px;
+    }
+
+    #day-activities-container {
+      max-height: 18rem;
+      padding: 0.625rem;
+    }
+
+    #submit-modal {
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+
+    #planner-toast {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      text-align: center;
+    }
+  }
+
   @media print {
     :global(header),
     :global(footer),
@@ -677,6 +777,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   const btnWhatsappChat = document.getElementById("btn-whatsapp-chat") as HTMLAnchorElement;
   const btnEmailReservation = document.getElementById("btn-email-reservation") as HTMLAnchorElement;
   const modalBtnPrint = document.getElementById("modal-btn-print")!;
+
+  const plannerMobileQuery = window.matchMedia("(max-width: 639px)");
+  const plannerSteps = document.querySelectorAll<HTMLDetailsElement>("[data-planner-step]");
+  function syncPlannerSteps() {
+    plannerSteps.forEach((step, index) => {
+      step.open = !plannerMobileQuery.matches || index === 0;
+      step.querySelector("summary")?.setAttribute("tabindex", plannerMobileQuery.matches ? "0" : "-1");
+    });
+  }
+  syncPlannerSteps();
+  plannerMobileQuery.addEventListener("change", syncPlannerSteps);
 
   let selectedVehicleId = loadedItinerary?.selectedVehicleId || (adminElements.vehicles[0]?.id || "");
   let selectedServices: string[] = loadedItinerary?.selectedServices || ["srv-transfer-in", "srv-transfer-out", "srv-fullday-tour"];
@@ -1250,7 +1361,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         "",
         "Please advise availability and prepare a formal quotation. Thank you.",
       ].join("\n");
-      btnWhatsappChat.href = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+      btnWhatsappChat.href = `https://wa.me/6285697561130?text=${encodeURIComponent(whatsappMessage)}`;
       btnEmailReservation.href = `mailto:${encodeURIComponent(contact.reservationEmail)}?subject=${encodeURIComponent(`Reservation request ${referenceCode} - ${data.guest.name}`)}&body=${encodeURIComponent(emailMessage)}`;
 
       submitModal.classList.remove("hidden");

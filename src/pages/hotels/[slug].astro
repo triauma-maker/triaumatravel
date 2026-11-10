@@ -1,0 +1,116 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HotelFacilities from "../../components/HotelFacilities.astro";
+import HotelLocationMap from "../../components/HotelLocationMap.astro";
+import { hotels } from "../../data/content";
+
+export function getStaticPaths() {
+  return hotels.map((hotel) => ({
+    params: { slug: hotel.slug },
+    props: { hotel },
+  }));
+}
+
+const { hotel = hotels[0] } = Astro.props ?? {};
+const currentSlug = Astro.params.slug;
+---
+
+<BaseLayout
+  title={`${hotel.title} | Tria Uma`}
+  description={hotel.description}
+  image={hotel.image}
+>
+  <section class="image-frame-hover relative flex min-h-[75svh] items-end overflow-hidden bg-forest text-white">
+    <img
+      src={hotel.image}
+      alt={hotel.title}
+      fetchpriority="high"
+      class="hotel-detail-image absolute inset-0 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10"></div>
+
+    <div class="container-editorial relative pb-16 pt-40 md:pb-24">
+      <a
+        href="/hotels/"
+        class="mb-8 inline-block text-xs tracking-widest"
+      >
+        ← ALL HOTELS & RESORTS
+      </a>
+      <p class="hotel-detail-category mb-4 text-xs tracking-[0.25em]">{hotel.category}</p>
+      <h1 class="hotel-detail-title editorial-title max-w-4xl text-6xl md:text-8xl">
+        {hotel.title}
+      </h1>
+      {hotel.location && (
+        <p class="hotel-detail-location mt-5 text-sm">{hotel.location}</p>
+      )}
+    </div>
+  </section>
+
+  <article class="container-editorial grid gap-12 py-20 md:grid-cols-[1.4fr_1fr] md:py-32">
+    <div>
+      <p class="mb-5 text-xs tracking-widest text-stone-500">
+        THE EXPERIENCE
+      </p>
+      <h2 class="editorial-title text-5xl md:text-6xl">
+        A stay beyond the ordinary.
+      </h2>
+    </div>
+
+    <div class="space-y-6 text-sm leading-8 text-stone-600">
+      <p class="hotel-detail-description">{hotel.description}</p>
+      <div class="hotel-detail-paragraphs space-y-6">
+        {hotel.body.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+      <a
+        href="/contact/"
+        class="mt-4 inline-flex border-b border-forest/40 pb-3 text-xs tracking-widest text-forest"
+      >
+        ENQUIRE ABOUT THIS STAY ↗
+      </a>
+    </div>
+  </article>
+
+  <div id="hotel-detail-facilities">
+    <HotelFacilities facilities={hotel.facilities} />
+  </div>
+
+  <HotelLocationMap
+    title={hotel.title}
+    location={hotel.location}
+    airportDriveTime={hotel.airportDriveTime}
+    nearbyHighlights={hotel.nearbyHighlights}
+  />
+
+  <script define:vars={{ currentSlug }}>
+    import { getSiteContent } from "../../utils/siteContentStorage";
+    import { hydrateHotelFacilities } from "../../utils/hotelFacilities";
+    import { hydrateHotelLocationMap } from "../../utils/hotelLocationMap";
+
+    const hotel = getSiteContent().hotels.find((item) => item.slug === currentSlug);
+    if (hotel) {
+      const image = document.querySelector(".hotel-detail-image") as HTMLImageElement;
+      const category = document.querySelector(".hotel-detail-category");
+      const title = document.querySelector(".hotel-detail-title");
+      const location = document.querySelector(".hotel-detail-location");
+      const description = document.querySelector(".hotel-detail-description");
+      const paragraphs = document.querySelector(".hotel-detail-paragraphs");
+      const facilities = document.getElementById("hotel-detail-facilities");
+      const locationMap = document.querySelector<HTMLElement>("[data-hotel-location-map]");
+      if (image) {
+        image.src = hotel.image;
+        image.alt = hotel.title;
+      }
+      if (category) category.textContent = hotel.category;
+      if (title) title.textContent = hotel.title;
+      if (location) location.textContent = hotel.location || "";
+      if (description) description.textContent = hotel.description;
+      if (paragraphs) {
+        paragraphs.innerHTML = (hotel.body || [])
+          .map((text) => `<p>${text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`)
+          .join("");
+      }
+      if (facilities) hydrateHotelFacilities(facilities, hotel.facilities || []);
+      if (locationMap) hydrateHotelLocationMap(locationMap, hotel);
+    }
+  </script>
+</BaseLayout>

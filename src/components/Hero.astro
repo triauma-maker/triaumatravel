@@ -1,0 +1,109 @@
+---
+import { parseOptimizedVideo } from "../utils/videoOptimizer";
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  image: string;
+  videoUrl?: string;
+  mediaType?: "image" | "video";
+  compact?: boolean;
+}
+
+const {
+  eyebrow = "DISCOVER THE EXTRAORDINARY",
+  title,
+  subtitle,
+  image,
+  videoUrl = "",
+  mediaType = "image",
+  compact = false,
+} = Astro.props;
+
+const videoInfo = parseOptimizedVideo(videoUrl);
+const isVideoActive = mediaType === "video" && videoInfo.type !== "none";
+---
+
+<section
+  class:list={[
+    "Tria Uma-hero relative flex items-end overflow-hidden bg-forest text-white",
+    compact ? "min-h-[65vh]" : "min-h-[88svh] md:min-h-[100svh]",
+  ]}
+>
+  <!-- Hero Background Media Container -->
+  <div id="hero-media-wrap" class="absolute inset-0 h-full w-full overflow-hidden" data-media-type={mediaType} data-video-url={videoUrl}>
+    <!-- Lightweight Poster Image (Always present for instantaneous LCP) -->
+    <img
+      src={image}
+      alt=""
+      fetchpriority="high"
+      class:list={[
+        "hero-image absolute inset-0 h-full w-full object-cover transition-opacity duration-1000",
+        isVideoActive ? "opacity-30" : "opacity-100",
+      ]}
+    />
+
+    <!-- Optimized Video Background Layer -->
+    {isVideoActive && (
+      videoInfo.type === "direct" || videoInfo.type === "gdrive" ? (
+        <video
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          poster={image}
+          class="hero-video-player absolute inset-0 z-[3] h-full w-full object-cover pointer-events-none"
+          style="object-position: center;"
+        >
+          <source src={videoInfo.streamUrl} type={videoInfo.type === "gdrive" ? undefined : videoInfo.originalUrl.toLowerCase().split(/[?#]/)[0].endsWith(".webm") ? "video/webm" : "video/mp4"} />
+        </video>
+      ) : (
+        <div class="hero-video-frame-wrap absolute inset-0 z-[3] h-full w-full overflow-hidden pointer-events-none">
+          <iframe
+            src={videoInfo.embedUrl}
+            title="Hero Background Video"
+            class="hero-video-iframe absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-[177.77vh] h-[56.25vw] pointer-events-none border-0"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      )
+    )}
+  </div>
+
+  <!-- Editorial Shading Gradients for Contrast -->
+  <div class="hero-shade absolute inset-0 z-[2] pointer-events-none"></div>
+
+  <!-- Content Container -->
+  <div class="container-editorial relative z-10 pb-16 pt-40 md:pb-28">
+    <p class="hero-eyebrow mb-5 text-[10px] tracking-[0.3em] md:text-xs">
+      {eyebrow}
+    </p>
+
+    <h1 class="editorial-title hero-title max-w-5xl text-6xl md:text-8xl lg:text-[110px]">
+      {title}
+    </h1>
+
+    {subtitle && (
+      <p class="hero-subtitle mt-6 max-w-xl text-sm leading-7 text-white/90 md:text-base">
+        {subtitle}
+      </p>
+    )}
+
+    <a
+      href="/contact/"
+      class="hero-cta mt-9 inline-flex items-center gap-5 border-b border-white/70 pb-3 text-xs tracking-[0.15em] hover:border-gold hover:text-gold transition-colors"
+    >
+      DISCOVER YOUR NEXT JOURNEY <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+
+  {!compact && (
+    <div class="hero-scroll absolute bottom-8 right-8 z-10 hidden items-center gap-4 text-[9px] tracking-[0.25em] text-white/80 md:flex" aria-hidden="true">
+      <span>SCROLL TO EXPLORE</span><span class="hero-scroll-line"></span>
+    </div>
+  )}
+</section>

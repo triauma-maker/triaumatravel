@@ -1,0 +1,179 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import ContentCard from "../../components/ContentCard.astro";
+import HotelLocationMap from "../../components/HotelLocationMap.astro";
+import { hotels } from "../../data/content";
+---
+
+<BaseLayout
+  title="Hotels & Resorts | Tria Uma"
+  description="Discover a curated collection of exceptional hotels and resorts."
+>
+  <Hero
+    compact
+    eyebrow="Tria Uma'S CHOICE"
+    title="Exceptional places to stay."
+    subtitle="A collection of extraordinary hotels, resorts, and private retreats."
+    image="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=2200&q=85"
+  />
+
+  <section id="cms-hotel-detail" class="hidden border-b border-forest/10 bg-white">
+    <div class="container-editorial py-16 md:py-24">
+      <a href="/hotels/" class="inline-block text-xs tracking-widest text-forest">← ALL HOTELS & RESORTS</a>
+      <p id="cms-hotel-category" class="mt-10 text-xs tracking-[0.25em] text-gold"></p>
+      <h1 id="cms-hotel-title" class="editorial-title mt-4 max-w-4xl text-5xl md:text-7xl text-forest"></h1>
+      <div class="mt-10 grid gap-10 md:grid-cols-2">
+        <img id="cms-hotel-image" alt="" class="aspect-[4/3] w-full object-cover" />
+        <div>
+          <p id="cms-hotel-location" class="mb-5 text-xs tracking-widest text-stone-500"></p>
+          <p id="cms-hotel-description" class="text-sm leading-8 text-stone-600"></p>
+          <div id="cms-hotel-body" class="mt-6 space-y-5 text-sm leading-8 text-stone-600"></div>
+        </div>
+      </div>
+      <div id="cms-hotel-facilities"></div>
+      <div id="cms-hotel-location-map" class="mt-12"></div>
+    </div>
+  </section>
+
+  <section class="container-editorial py-20 md:py-28">
+    <p class="mb-4 text-xs tracking-widest text-stone-500">
+      OUR COLLECTION
+    </p>
+    <h2 class="editorial-title mb-12 text-5xl md:text-7xl">
+      Find your next sanctuary.
+    </h2>
+
+    <div class="cms-hotels-grid grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
+      {hotels.map((hotel) => (
+        <ContentCard
+          {...hotel}
+          href={`/hotels/${hotel.slug}/`}
+        />
+      ))}
+    </div>
+  </section>
+
+  <script>
+    import { getSiteContent, SITE_STORAGE_KEYS } from "../../utils/siteContentStorage";
+    import { parseOptimizedVideo } from "../../utils/videoOptimizer";
+    import { hydrateHotelFacilities } from "../../utils/hotelFacilities";
+    import { hydrateHotelLocationMap } from "../../utils/hotelLocationMap";
+
+    function hydrateHotelsHero() {
+      const { hotelsHero } = getSiteContent();
+      const heroMediaWrap = document.getElementById("hero-media-wrap");
+      const heroImage = heroMediaWrap?.querySelector<HTMLImageElement>(".hero-image");
+      if (!heroMediaWrap) return;
+
+      heroMediaWrap.querySelectorAll(".hero-video-player, .hero-video-frame-wrap").forEach((element) => element.remove());
+      if (heroImage) {
+        if (hotelsHero.image) {
+          heroImage.hidden = false;
+          heroImage.src = hotelsHero.image;
+        } else {
+          heroImage.hidden = true;
+          heroImage.removeAttribute("src");
+        }
+      }
+
+      const videoInfo = parseOptimizedVideo(hotelsHero.videoUrl);
+      if (hotelsHero.mediaType !== "video" || videoInfo.type === "none") {
+        heroImage?.classList.remove("opacity-0");
+        heroImage?.classList.add("opacity-100");
+        return;
+      }
+
+      heroImage?.classList.remove("opacity-100");
+      heroImage?.classList.add("opacity-0");
+      if (videoInfo.type === "direct" || videoInfo.type === "gdrive") {
+        const video = document.createElement("video");
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.preload = "auto";
+        video.className = "hero-video-player absolute inset-0 z-[3] h-full w-full object-cover pointer-events-none";
+        if (hotelsHero.image) video.poster = hotelsHero.image;
+
+        const source = document.createElement("source");
+        source.src = videoInfo.streamUrl || "";
+        const sourceUrl = videoInfo.originalUrl.toLowerCase().split(/[?#]/)[0];
+        if (videoInfo.type === "direct" && sourceUrl.endsWith(".webm")) source.type = "video/webm";
+        else if (videoInfo.type === "direct" && (sourceUrl.endsWith(".ogv") || sourceUrl.endsWith(".ogg"))) source.type = "video/ogg";
+        else if (videoInfo.type === "direct" && sourceUrl.endsWith(".mp4")) source.type = "video/mp4";
+        video.appendChild(source);
+        heroMediaWrap.appendChild(video);
+        video.play().catch((error: unknown) => {
+          console.error("Failed to autoplay Hotels page hero video:", error);
+        });
+        video.addEventListener("error", () => {
+          video.remove();
+          if (!videoInfo.embedUrl) {
+            console.error("Hotels page hero video could not be loaded:", videoInfo.originalUrl);
+            return;
+          }
+          const frame = document.createElement("div");
+          frame.className = "hero-video-frame-wrap absolute inset-0 z-[3] h-full w-full overflow-hidden pointer-events-none";
+          frame.innerHTML = `<iframe src="${videoInfo.embedUrl}" title="Hotels Background Video" class="hero-video-iframe absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-[177.77vh] h-[56.25vw] border-0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+          heroMediaWrap.appendChild(frame);
+        }, { once: true });
+        return;
+      }
+
+      const frame = document.createElement("div");
+      frame.className = "hero-video-frame-wrap absolute inset-0 z-[3] h-full w-full overflow-hidden pointer-events-none";
+      frame.innerHTML = `<iframe src="${videoInfo.embedUrl}" title="Hotels Background Video" class="hero-video-iframe absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-[177.77vh] h-[56.25vw] border-0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+      heroMediaWrap.appendChild(frame);
+    }
+
+    hydrateHotelsHero();
+    window.addEventListener("tria_uma_site_content_updated", hydrateHotelsHero);
+    window.addEventListener("storage", (event) => {
+      if (event.key === SITE_STORAGE_KEYS.SITE_CONTENT || event.key === null) {
+        hydrateHotelsHero();
+      }
+    });
+
+    const slug = new URLSearchParams(window.location.search).get("hotel");
+    if (slug) {
+      const hotel = getSiteContent().hotels.find((item) => item.slug === slug);
+      const detail = document.getElementById("cms-hotel-detail");
+      if (hotel && detail) {
+        detail.classList.remove("hidden");
+        (document.getElementById("cms-hotel-category")!).textContent = hotel.category;
+        (document.getElementById("cms-hotel-title")!).textContent = hotel.title;
+        (document.getElementById("cms-hotel-description")!).textContent = hotel.description;
+        (document.getElementById("cms-hotel-location")!).textContent = hotel.location || "";
+        const image = document.getElementById("cms-hotel-image") as HTMLImageElement;
+        image.src = hotel.image;
+        image.alt = hotel.title;
+        document.getElementById("cms-hotel-body")!.innerHTML = (hotel.body || [])
+          .map((paragraph) => `<p>${paragraph.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`)
+          .join("");
+        const facilitiesContainer = document.getElementById("cms-hotel-facilities");
+        if (facilitiesContainer) hydrateHotelFacilities(facilitiesContainer, hotel.facilities || []);
+        const mapContainer = document.getElementById("cms-hotel-location-map");
+        if (mapContainer) {
+          mapContainer.innerHTML = `
+            <div class="hotel-location-map max-w-3xl border border-forest/15 bg-white p-5 shadow-sm sm:p-7" data-hotel-location-map>
+              <h2 class="font-display text-3xl text-forest">Location &amp; Nearby</h2>
+              <p class="hotel-location-address mt-2 text-sm text-stone-500"></p>
+              <div class="mt-5 h-56 overflow-hidden border border-forest/10 bg-sand sm:h-64">
+                <iframe class="hotel-location-iframe h-full w-full border-0" title="Hotel location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-forest/10 pt-4 text-sm text-stone-600">
+                <p class="hotel-airport-info flex items-center gap-2"><span aria-hidden="true">✈️</span></p>
+                <p class="hotel-highlights-info flex items-center gap-2" hidden><span aria-hidden="true">📍</span></p>
+              </div>
+              <a class="hotel-directions-link mt-5 inline-flex border-b border-forest/40 pb-2 text-[10px] tracking-widest text-forest transition-colors hover:border-forest hover:text-gold" target="_blank" rel="noopener noreferrer">VIEW ROUTE FROM THE AIRPORT ↗</a>
+            </div>
+          `;
+          const locationMap = mapContainer.querySelector<HTMLElement>("[data-hotel-location-map]");
+          if (locationMap) hydrateHotelLocationMap(locationMap, hotel);
+        }
+        detail.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  </script>
+</BaseLayout>

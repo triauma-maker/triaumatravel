@@ -1,0 +1,154 @@
+---
+const links = [
+  { label: "EXPERIENCES", href: "/experience/" },
+  { label: "HOTELS", href: "/hotels/" },
+  { label: "JOURNAL", href: "/journal/" },
+  { label: "ABOUT", href: "/about/" },
+];
+---
+
+<header
+  class="fixed inset-x-0 top-0 z-[9999] border-b border-white/15
+         bg-forest/[0.60] text-white shadow-lg shadow-black/5
+         backdrop-blur-md"
+>
+  <div class="container-editorial flex items-center justify-between gap-6 py-5">
+
+    <!-- Logo -->
+    <a href="/" class="shrink-0 flex items-center gap-3.5" aria-label="Tria Uma home">
+      <!-- Logo image in white circle with gold ring -->
+      <div class="relative shrink-0">
+        <div class="h-15 w-15 rounded-full bg-white shadow-lg ring-2 ring-[#a78a63]/60 flex items-center justify-center overflow-hidden">
+          <img
+            src="/tria-uma-logo.png"
+            alt="Tria Uma Logo"
+            class="h-14 w-14 object-contain"
+            loading="eager"
+          />
+        </div>
+        <!-- Subtle glow behind the circle -->
+        <div class="absolute inset-0 rounded-full bg-white/20 blur-md -z-10 scale-110"></div>
+      </div>
+      <!-- Brand name + tagline -->
+      <div>
+        <span class="font-display text-3xl font-bold tracking-[0.16em] block drop-shadow-sm">
+          TRIA UMA
+        </span>
+        <span class="mt-0.5 block text-[9px] font-bold tracking-[0.28em] text-white/80 brand-tagline">
+          SIMPLE, QUALITY &amp; SATISFACTION
+        </span>
+      </div>
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav
+      class="hidden items-center gap-6 xl:flex"
+      aria-label="Main navigation"
+    >
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class="text-[14px] font-bold tracking-[0.12em] transition-opacity
+                 duration-300 hover:opacity-60"
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Profile / Saved Itineraries link -->
+      <a
+        href="/profile/"
+        class="hidden items-center gap-1.5 border border-white/30 px-3.5 py-3 text-[10px]
+               tracking-[0.15em] transition-colors duration-300
+               hover:border-white hover:bg-white/10 md:inline-flex"
+        title="My Profile & Saved Itineraries"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span>MY ITINERARY</span>
+      </a>
+
+      <!-- Plan your journey button -->
+      <a
+        href="/plan-your-journey/"
+        class="hidden items-center gap-1.5 border border-white/30 px-3.5 py-3 text-[10px]
+               tracking-[0.15em] transition-colors duration-300
+               hover:border-white hover:bg-white/10 md:inline-flex"
+      >
+        PLAN YOUR JOURNEY ↗
+      </a>
+
+      <!-- Mobile menu button -->
+      <button
+        id="menu-toggle"
+        type="button"
+        class="inline-flex h-10 w-10 items-center justify-center
+               border border-white/60 xl:hidden"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span class="text-xl" aria-hidden="true">☰</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile navigation -->
+  <nav
+    id="mobile-menu"
+    class="container-editorial hidden bg-forest/[0.95] px-6 py-5 xl:hidden"
+    aria-label="Mobile navigation"
+  >
+    {links.map((link) => (
+      <a
+        href={link.href}
+        class="block border-b border-white/15 py-4 text-xs tracking-widest"
+      >
+        {link.label}
+      </a>
+    ))}
+
+    <a
+      href="/profile/"
+      class="block border-b border-white/15 py-4 text-xs tracking-widest flex items-center justify-between"
+    >
+      <span>MY PROFILE & SAVED ITINERARIES</span>
+      <span>👤 ↗</span>
+    </a>
+
+    <a
+      href="/plan-your-journey/"
+      class="block border-b border-white/15 py-4 text-xs tracking-widest text-gold font-medium"
+    >
+      PLAN YOUR JOURNEY ↗
+    </a>
+
+    <a
+      href="/contact/"
+      class="block pt-4 text-xs tracking-widest text-white/70"
+    >
+      CONTACT ↗
+    </a>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("#menu-toggle");
+  const menu = document.querySelector<HTMLElement>("#mobile-menu");
+
+  toggle?.addEventListener("click", () => {
+    const isOpen = toggle.getAttribute("aria-expanded") === "true";
+
+    toggle.setAttribute("aria-expanded", String(!isOpen));
+    toggle.setAttribute(
+      "aria-label",
+      isOpen ? "Open navigation menu" : "Close navigation menu",
+    );
+
+    menu?.classList.toggle("hidden", isOpen);
+  });
+</script>

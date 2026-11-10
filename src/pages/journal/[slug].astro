@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("journal");
+
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug ?? entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, category, image } = entry.data;
+---
+
+<BaseLayout title={`${title} | JOURNAL`} description={description} image={image}>
+  <article>
+    <header class="container-editorial pb-12 pt-40 md:pt-52">
+      <a href="/journal/" class="text-xs tracking-widest">← JOURNAL</a>
+      <p class="mt-10 text-xs tracking-[0.2em] text-stone-500">{category}</p>
+      <h1 class="editorial-title mt-4 max-w-5xl text-5xl md:text-8xl">{title}</h1>
+      <p class="mt-6 max-w-2xl text-sm leading-8 text-stone-600">{description}</p>
+    </header>
+
+    <div class="image-frame-hover overflow-hidden">
+      <img src={image} alt={title} fetchpriority="high" class="max-h-[75vh] w-full object-cover" />
+    </div>
+
+    <div class="journal-content container-editorial max-w-3xl py-16 text-sm leading-8 text-stone-600 md:py-24">
+      <Content />
+      <a href="/contact/" class="inline-block border-b border-forest pb-2 text-xs tracking-widest">PLAN A SIMILAR JOURNEY ↗</a>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .journal-content :global(h2) {
+    margin-top: 3rem;
+    font-family: Georgia, serif;
+    font-size: 2rem;
+    line-height: 1.2;
+    color: var(--color-forest, #24372f);
+  }
+
+  .journal-content :global(p + p) {
+    margin-top: 1.75rem;
+  }
+</style>

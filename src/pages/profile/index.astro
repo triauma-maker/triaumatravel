@@ -1,0 +1,516 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="My Profile & Saved Journeys | Tria Uma"
+  description="Manage your profile information and access your saved bespoke travel itineraries, PDF proposals, and reservation requests."
+>
+  <!-- Hero Section -->
+  <section class="bg-forest text-white pt-36 pb-16 border-b border-white/10">
+    <div class="container-editorial">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-[10px] tracking-[0.3em] uppercase text-gold font-medium block mb-2">
+            GUEST PORTAL
+          </span>
+          <h1 class="editorial-title text-4xl sm:text-6xl max-w-2xl">
+            My Profile & Saved Journeys
+          </h1>
+          <p class="text-white/70 max-w-xl text-xs sm:text-sm mt-3 leading-relaxed">
+            All your tailor-made itineraries created in the custom builder are preserved directly in your browser. Review day-by-day programs, generate PDFs, or submit them to reservation.
+          </p>
+        </div>
+        <div>
+          <a
+            href="/plan-your-journey/"
+            class="bg-gold text-forest hover:bg-gold/90 px-5 py-3 text-xs tracking-widest uppercase font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
+          >
+            <span>+ PLAN NEW JOURNEY</span>
+            <span>↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile & Itineraries Body -->
+  <section class="container-editorial py-12 md:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+      <!-- LEFT: Profile Information (4 cols) -->
+      <div class="lg:col-span-4">
+        <div class="bg-white border border-forest/15 p-6 shadow-sm sticky top-28">
+          <div class="border-b border-forest/10 pb-4 mb-5">
+            <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">CONTACT DETAILS</span>
+            <h2 class="font-display text-2xl text-forest mt-0.5">Guest Information</h2>
+            <p class="text-[11px] text-stone-500 mt-1">Used to pre-fill your reservation requests and itinerary proposals.</p>
+          </div>
+
+          <form id="profile-form" class="space-y-4 text-xs">
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-forest font-medium mb-1">
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="profile-name"
+                class="w-full border border-forest/20 p-2.5 bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                placeholder="e.g. Eleanor Vance"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-forest font-medium mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="profile-email"
+                class="w-full border border-forest/20 p-2.5 bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                placeholder="name@example.com"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-forest font-medium mb-1">
+                Phone / WhatsApp
+              </label>
+              <input
+                type="tel"
+                id="profile-phone"
+                class="w-full border border-forest/20 p-2.5 bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                placeholder="+62 812 3456 7890"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-forest font-medium mb-1">
+                Country / Residence
+              </label>
+              <input
+                type="text"
+                id="profile-country"
+                class="w-full border border-forest/20 p-2.5 bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                placeholder="e.g. Australia, Singapore, United Kingdom"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-forest font-medium mb-1">
+                Special Travel Notes
+              </label>
+              <textarea
+                id="profile-notes"
+                rows="2"
+                class="w-full border border-forest/20 p-2.5 bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                placeholder="e.g. Honeymoon couple, prefers quiet ocean villas, allergic to nuts..."
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-forest text-white py-2.5 text-xs tracking-widest uppercase font-medium hover:bg-forest/90 transition-colors mt-2"
+            >
+              SAVE PROFILE DETAILS
+            </button>
+          </form>
+
+          <!-- Quick Navigation -->
+          <div class="mt-8 pt-6 border-t border-forest/10 space-y-2 text-xs">
+            <span class="text-[9px] tracking-widest text-gold uppercase font-semibold block mb-2">QUICK LINKS</span>
+            <a href="/plan-your-journey/" class="block text-forest hover:text-gold transition-colors font-medium">
+              → Create New Custom Itinerary
+            </a>
+            <a href="/plans/" class="block text-forest hover:text-gold transition-colors">
+              → Browse Signature Journeys
+            </a>
+            <a href="/admin/" class="block text-stone-400 hover:text-forest transition-colors text-[11px] pt-1">
+              → Manage Itinerary Elements (Admin)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Saved Itineraries (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-forest/15 pb-4">
+          <div>
+            <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STORED IN BROWSER</span>
+            <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Saved Itineraries (<span id="count-itineraries">0</span>)</h2>
+          </div>
+          <span class="text-xs text-stone-500 font-mono">Local Storage</span>
+        </div>
+
+        <!-- Itineraries List Container -->
+        <div id="itineraries-list" class="space-y-6">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-itineraries" class="hidden text-center py-20 px-6 border border-dashed border-forest/25 bg-sand/15">
+          <div class="w-16 h-16 mx-auto rounded-full bg-forest/5 flex items-center justify-center text-3xl mb-4 text-forest">
+            🗺️
+          </div>
+          <h3 class="font-display text-3xl text-forest">No saved itineraries yet.</h3>
+          <p class="text-xs text-stone-600 max-w-md mx-auto mt-2 leading-relaxed">
+            You haven't crafted any custom itineraries yet. Use our bespoke itinerary builder to select your hotels, activities, vehicle, and day-to-day schedule.
+          </p>
+          <a
+            href="/plan-your-journey/"
+            class="mt-6 inline-block bg-forest text-white px-6 py-3 text-xs tracking-widest uppercase font-medium hover:bg-forest/90 transition-colors"
+          >
+            START PLANNING YOUR JOURNEY ↗
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRINTABLE DOCUMENT LAYOUT (Active during window.print) -->
+  <div id="printable-itinerary-profile" class="hidden print:block p-8 bg-white text-black font-serif">
+    <!-- Rendered dynamically for printing -->
+  </div>
+
+  <!-- Toast -->
+  <div id="profile-toast" class="fixed bottom-6 right-6 z-[100000] bg-forest text-white px-6 py-3.5 shadow-xl text-xs tracking-widest uppercase border border-gold/40 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    Profile updated successfully!
+  </div>
+</BaseLayout>
+
+<style>
+  @media print {
+    header, footer, nav, section, #profile-toast {
+      display: none !important;
+    }
+    #printable-itinerary-profile {
+      display: block !important;
+      font-family: Georgia, serif !important;
+      color: #111 !important;
+    }
+  }
+</style>
+
+<script>
+  import {
+    getUserItineraries,
+    deleteUserItinerary,
+    getUserProfile,
+    saveUserProfile,
+    getAdminElements,
+    saveUserItinerary,
+    generateReservationReference,
+    type CustomItineraryData,
+  } from "../../utils/itineraryStorage";
+
+  const adminElements = getAdminElements();
+  const profileForm = document.getElementById("profile-form") as HTMLFormElement;
+  const profileName = document.getElementById("profile-name") as HTMLInputElement;
+  const profileEmail = document.getElementById("profile-email") as HTMLInputElement;
+  const profilePhone = document.getElementById("profile-phone") as HTMLInputElement;
+  const profileCountry = document.getElementById("profile-country") as HTMLInputElement;
+  const profileNotes = document.getElementById("profile-notes") as HTMLTextAreaElement;
+
+  const itinerariesList = document.getElementById("itineraries-list")!;
+  const emptyItineraries = document.getElementById("empty-itineraries")!;
+  const countItineraries = document.getElementById("count-itineraries")!;
+  const toast = document.getElementById("profile-toast")!;
+
+  function showToast(msg: string) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.remove("translate-y-20", "opacity-0");
+    setTimeout(() => {
+      toast.classList.add("translate-y-20", "opacity-0");
+    }, 2800);
+  }
+
+  // Load Profile
+  const existingProfile = getUserProfile() as any;
+  if (existingProfile) {
+    profileName.value = existingProfile.name || "";
+    profileEmail.value = existingProfile.email || "";
+    profilePhone.value = existingProfile.phone || "";
+    profileCountry.value = existingProfile.country || "";
+    profileNotes.value = existingProfile.notes || "";
+  }
+
+  profileForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    saveUserProfile({
+      name: profileName.value.trim(),
+      email: profileEmail.value.trim(),
+      phone: profilePhone.value.trim(),
+      country: profileCountry.value.trim(),
+      notes: profileNotes.value.trim(),
+    });
+    showToast("Profile details saved!");
+  });
+
+  // Render Itineraries
+  function renderItineraries() {
+    const list = getUserItineraries();
+    countItineraries.textContent = String(list.length);
+
+    if (list.length === 0) {
+      emptyItineraries.classList.remove("hidden");
+      itinerariesList.innerHTML = "";
+      return;
+    }
+
+    emptyItineraries.classList.add("hidden");
+    itinerariesList.innerHTML = "";
+
+    list.forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "bg-white border border-forest/15 p-6 md:p-8 shadow-sm hover:border-forest/30 transition-all";
+
+      const veh = adminElements.vehicles.find((v) => v.id === item.selectedVehicleId);
+      const isSubmitted = item.status === "submitted";
+
+      let statusBadge = "";
+      if (isSubmitted) {
+        statusBadge = `
+          <span class="bg-[#25D366]/15 text-[#1b8a45] border border-[#25D366]/30 px-3 py-1 text-[10px] tracking-widest uppercase font-semibold">
+            ✓ SUBMITTED (${item.referenceCode || "RESERVATION"})
+          </span>
+        `;
+      } else {
+        statusBadge = `
+          <span class="bg-gold/15 text-forest border border-gold/40 px-3 py-1 text-[10px] tracking-widest uppercase font-semibold">
+            SAVED DRAFT
+          </span>
+        `;
+      }
+
+      // Schedule list items
+      const scheduleItems = item.days
+        .map((d) => {
+          const hotel = adminElements.hotels.find((h) => h.id === d.hotelId);
+          return `
+            <div class="py-1.5 border-b border-stone-100 last:border-b-0 text-xs flex justify-between gap-4">
+              <span class="font-medium text-forest">Day ${d.dayNumber}: ${d.title}</span>
+              <span class="text-stone-500 truncate max-w-[200px]">${hotel ? hotel.name : "Leisure"}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      card.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-forest/10 pb-4 mb-4">
+          <div>
+            <span class="text-[9px] tracking-widest text-gold uppercase font-semibold">
+              UPDATED: ${new Date(item.updatedAt || item.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+            <h3 class="font-display text-2xl text-forest mt-0.5">${item.title}</h3>
+          </div>
+          <div>${statusBadge}</div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-ivory p-4 border border-forest/10 text-xs mb-5">
+          <div>
+            <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Duration</span>
+            <span class="font-semibold text-forest">${item.durationDays} Days / ${item.durationNights} Nights</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Travellers</span>
+            <span class="font-semibold text-forest">${item.travellers.adults} Adults${item.travellers.children ? `, ${item.travellers.children} Ch` : ""}</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Chauffeur Car</span>
+            <span class="font-semibold text-forest truncate block">${veh ? veh.name : "Custom"}</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Pricing</span>
+            <span class="font-semibold text-gold">On Request</span>
+          </div>
+        </div>
+
+        <!-- Schedule Accordion/Preview -->
+        <div class="mb-6">
+          <details class="cursor-pointer group">
+            <summary class="text-xs uppercase tracking-wider text-forest font-medium list-none flex items-center justify-between py-1 hover:text-gold transition-colors">
+              <span>View Day-by-Day Schedule (${item.days.length} Days)</span>
+              <span class="text-xs group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div class="mt-3 bg-sand/15 p-3.5 border border-forest/10 space-y-1">
+              ${scheduleItems}
+            </div>
+          </details>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-forest/10">
+          <div class="flex flex-wrap items-center gap-2">
+            <a
+              href="/plan-your-journey/?id=${item.id}"
+              class="border border-forest/30 hover:border-forest text-forest px-4 py-2 text-xs tracking-widest uppercase transition-colors"
+            >
+              Open / Edit
+            </a>
+            <button
+              type="button"
+              class="btn-print-pdf border border-forest/30 hover:border-forest text-forest px-4 py-2 text-xs tracking-widest uppercase transition-colors"
+              data-id="${item.id}"
+            >
+              Print / PDF
+            </button>
+            ${
+              !isSubmitted
+                ? `
+              <button
+                type="button"
+                class="btn-submit-quick bg-forest text-white hover:bg-forest/90 px-4 py-2 text-xs tracking-widest uppercase transition-colors font-medium"
+                data-id="${item.id}"
+              >
+                Submit to Reservation
+              </button>
+            `
+                : `
+              <a
+                href="https://wa.me/6281234567890?text=${encodeURIComponent(`Hello Tria Uma Reservation, following up on submitted itinerary ${item.referenceCode} for ${item.guest.name}.`)}"
+                target="_blank"
+                class="bg-[#25D366] text-white hover:opacity-90 px-4 py-2 text-xs tracking-widest uppercase transition-opacity font-medium inline-flex items-center gap-1"
+              >
+                <span>WhatsApp Reservation</span>
+              </a>
+            `
+            }
+          </div>
+
+          <button
+            type="button"
+            class="btn-delete text-stone-400 hover:text-red-600 text-xs tracking-wider uppercase transition-colors"
+            data-id="${item.id}"
+          >
+            Delete
+          </button>
+        </div>
+      `;
+
+      itinerariesList.appendChild(card);
+    });
+
+    // Attach Event Handlers
+    itinerariesList.querySelectorAll<HTMLButtonElement>(".btn-delete").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!confirm("Are you sure you want to delete this saved itinerary from your browser?")) return;
+        deleteUserItinerary(btn.dataset.id!);
+        renderItineraries();
+        showToast("Itinerary deleted.");
+      });
+    });
+
+    itinerariesList.querySelectorAll<HTMLButtonElement>(".btn-print-pdf").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const item = list.find((x) => x.id === btn.dataset.id);
+        if (item) printItineraryFromProfile(item);
+      });
+    });
+
+    itinerariesList.querySelectorAll<HTMLButtonElement>(".btn-submit-quick").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const item = list.find((x) => x.id === btn.dataset.id);
+        if (!item) return;
+
+        if (!item.guest.name || !item.guest.email) {
+          alert("Please fill your profile name and email on the left before submitting to reservation.");
+          return;
+        }
+
+        item.status = "submitted";
+        item.referenceCode = generateReservationReference();
+        saveUserItinerary(item);
+        renderItineraries();
+        showToast(`Submitted to Reservation! Ref: ${item.referenceCode}`);
+      });
+    });
+  }
+
+  function printItineraryFromProfile(data: CustomItineraryData) {
+    const printable = document.getElementById("printable-itinerary-profile")!;
+    const veh = adminElements.vehicles.find((v) => v.id === data.selectedVehicleId);
+    const servicesList = adminElements.services
+      .filter((s) => data.selectedServices.includes(s.id))
+      .map((s) => s.name)
+      .join(", ");
+
+    let daysHtml = "";
+    data.days.forEach((day) => {
+      const hotel = adminElements.hotels.find((h) => h.id === day.hotelId);
+      const acts = adminElements.activities.filter((a) => (day.activityIds || []).includes(a.id));
+      const srv = adminElements.services.find((s) => s.id === day.serviceId);
+
+      daysHtml += `
+        <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #ddd;">
+          <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #23382f;">Day ${day.dayNumber}: ${day.title}</h3>
+          <div style="font-size: 13px; line-height: 1.6; color: #444;">
+            ${hotel ? `<div><strong>Hotel Stay:</strong> ${hotel.name} (${hotel.location}) - <em>${hotel.category}</em></div>` : ""}
+            ${srv ? `<div><strong>Day Service:</strong> ${srv.name}</div>` : ""}
+            ${acts.length > 0 ? `<div><strong>Curated Experiences:</strong> ${acts.map((a) => a.title).join("; ")}</div>` : ""}
+            ${day.notes ? `<div><strong>Notes:</strong> ${day.notes}</div>` : ""}
+          </div>
+        </div>
+      `;
+    });
+
+    printable.innerHTML = `
+      <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #23382f; padding-bottom: 16px; margin-bottom: 24px;">
+          <div>
+            <h1 style="margin: 0; font-size: 28px; letter-spacing: 2px; color: #23382f;">TRIA UMA</h1>
+            <p style="margin: 4px 0 0 0; font-size: 10px; letter-spacing: 3px; color: #777;">LUXURY TRAVEL COLLECTION</p>
+          </div>
+          <div style="text-align: right; font-size: 12px; color: #555;">
+            <div><strong>Reference:</strong> ${data.referenceCode || "SAVED ITINERARY"}</div>
+            <div><strong>Date:</strong> ${new Date().toLocaleDateString("en-GB")}</div>
+            <div><strong>Status:</strong> ${data.status.toUpperCase()}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #a78a63; text-transform: uppercase;">BESPOKE ITINERARY</span>
+          <h2 style="margin: 6px 0 12px 0; font-size: 24px; color: #23382f;">${data.title}</h2>
+          
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; background: #faf9f6;">
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Lead Guest:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${data.guest.name} (${data.guest.phone || "N/A"})</td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Duration:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${data.durationDays} Days / ${data.durationNights} Nights</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Travellers:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${data.travellers.adults} Adults${data.travellers.children ? `, ${data.travellers.children} Children` : ""}</td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Private Vehicle:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${veh ? veh.name : "Custom"}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Services Included:</strong></td>
+              <td colspan="3" style="padding: 8px; border: 1px solid #e0ded8;">${servicesList || "Standard bespoke chauffeur services"}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h3 style="border-bottom: 1px solid #23382f; padding-bottom: 6px; font-size: 16px; letter-spacing: 1px; color: #23382f; text-transform: uppercase;">Day-by-Day Itinerary Schedule</h3>
+          <div style="margin-top: 16px;">
+            ${daysHtml}
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid #23382f; padding-top: 16px; font-size: 11px; color: #666; line-height: 1.6;">
+          <p><strong>Note on Pricing & Inclusions:</strong> This bespoke itinerary is prepared on request. Quotation is finalized based on confirmed travel dates, season surcharges, and personalized inclusions. Submit this to <em>reservation@triauma.com</em> or WhatsApp <em>+62 812 3456 7890</em>.</p>
+        </div>
+      </div>
+    `;
+
+    window.print();
+  }
+
+  // Initial load
+  renderItineraries();
+</script>
+

@@ -1,0 +1,1324 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Plan Your Journey | Custom Itinerary Builder | Tria Uma"
+  description="Create your personalized luxury travel itinerary with custom day-to-day programs, hotels, activities, private vehicles, and bespoke services."
+>
+  <!-- Hero Section -->
+  <section class="relative bg-forest text-white pt-36 pb-20 overflow-hidden border-b border-white/10">
+    <div class="absolute inset-0 opacity-20 pointer-events-none">
+      <img
+        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
+        alt=""
+        class="w-full h-full object-cover"
+      />
+    </div>
+    <div class="container-editorial relative">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-[10px] tracking-[0.35em] uppercase text-gold font-medium block mb-2">
+            BESPOKE ITINERARY BUILDER
+          </span>
+          <h1 class="editorial-title text-4xl sm:text-6xl md:text-7xl max-w-3xl">
+            Design your tailor-made journey.
+          </h1>
+          <p class="text-white/70 max-w-2xl text-xs sm:text-sm mt-4 leading-relaxed">
+            Craft every detail of your holiday. Select your preferred luxury stays, curated experiences, dedicated private vehicle, and personalized services. Once completed, you can save it to your profile, generate a bespoke PDF, or submit it directly to our reservation team for a personalized quotation.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a
+            href="/profile/"
+            class="border border-white/30 text-white/80 hover:border-white hover:text-white px-4 py-2.5 text-[11px] tracking-widest uppercase transition-colors inline-flex items-center gap-2"
+          >
+            <span>MY SAVED TRIPS</span>
+            <span>👤</span>
+          </a>
+          <a
+            href="/admin/"
+            class="border border-gold/40 text-gold hover:bg-gold hover:text-forest px-4 py-2.5 text-[11px] tracking-widest uppercase transition-colors text-[10px]"
+            title="Manage elements in Admin Dashboard"
+          >
+            ⚙ ADMIN
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Planner App -->
+  <section class="container-editorial py-12 md:py-20" id="planner-section">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+      <!-- LEFT COLUMN: BUILDER FORM (8 cols) -->
+      <div class="lg:col-span-7 xl:col-span-8 space-y-12">
+
+        <!-- STEP 1: JOURNEY OVERVIEW & GUEST DETAILS -->
+        <div class="bg-white border border-forest/15 p-6 md:p-8 shadow-sm">
+          <div class="flex items-center justify-between border-b border-forest/10 pb-4 mb-6">
+            <div>
+              <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STEP 1 OF 3</span>
+              <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Journey & Guest Details</h2>
+            </div>
+            <span class="text-xs text-stone-400 font-mono">01</span>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Itinerary Title -->
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                Journey Name / Title *
+              </label>
+              <input
+                type="text"
+                id="input-title"
+                class="w-full border border-forest/20 p-3 text-sm bg-ivory focus:bg-white focus:outline-none focus:border-forest transition-colors"
+                placeholder="e.g. Enchanting Bali Discovery & Coastal Retreat"
+                value="My Bespoke Bali & Beyond Journey"
+              />
+            </div>
+
+            <!-- Guest Contact Details -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Lead Guest Name *
+                </label>
+                <input
+                  type="text"
+                  id="input-guest-name"
+                  class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                  placeholder="e.g. Alexandra Sterling"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  id="input-guest-email"
+                  class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                  placeholder="name@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Phone / WhatsApp *
+                </label>
+                <input
+                  type="tel"
+                  id="input-guest-phone"
+                  class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:bg-white focus:outline-none focus:border-forest"
+                  placeholder="+62 812 3456 7890"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Duration & Dates -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Duration (Days) *
+                </label>
+                <div class="flex items-center border border-forest/20 bg-ivory">
+                  <button type="button" id="btn-duration-minus" class="px-3 py-2.5 text-forest hover:bg-forest/10 font-bold">−</button>
+                  <input
+                    type="number"
+                    id="input-duration"
+                    min="1"
+                    max="30"
+                    value="5"
+                    class="w-full text-center bg-transparent text-sm font-semibold text-forest focus:outline-none"
+                  />
+                  <button type="button" id="btn-duration-plus" class="px-3 py-2.5 text-forest hover:bg-forest/10 font-bold">+</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Nights
+                </label>
+                <input
+                  type="text"
+                  id="display-nights"
+                  readonly
+                  value="4 Nights"
+                  class="w-full border border-forest/20 p-3 text-xs bg-sand/30 text-stone-600 font-medium"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  id="input-start-date"
+                  class="w-full border border-forest/20 p-2.5 text-xs bg-ivory focus:outline-none focus:border-forest"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  id="input-end-date"
+                  class="w-full border border-forest/20 p-2.5 text-xs bg-ivory focus:outline-none focus:border-forest"
+                />
+              </div>
+            </div>
+
+            <!-- Travellers Count -->
+            <div class="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Adults
+                </label>
+                <select id="input-adults" class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:outline-none focus:border-forest">
+                  <option value="1">1 Adult</option>
+                  <option value="2" selected>2 Adults (Couple)</option>
+                  <option value="3">3 Adults</option>
+                  <option value="4">4 Adults</option>
+                  <option value="5">5 Adults</option>
+                  <option value="6">6 Adults</option>
+                  <option value="8">8 Adults (Group)</option>
+                  <option value="10">10+ Adults (Large Delegation)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                  Children
+                </label>
+                <select id="input-children" class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:outline-none focus:border-forest">
+                  <option value="0" selected>0 Children</option>
+                  <option value="1">1 Child</option>
+                  <option value="2">2 Children</option>
+                  <option value="3">3 Children</option>
+                  <option value="4">4+ Children</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: CHAUFFEUR VEHICLE & ESSENTIAL SERVICES -->
+        <div class="bg-white border border-forest/15 p-6 md:p-8 shadow-sm">
+          <div class="flex items-center justify-between border-b border-forest/10 pb-4 mb-6">
+            <div>
+              <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STEP 2 OF 3</span>
+              <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Vehicle & Essential Services</h2>
+            </div>
+            <span class="text-xs text-stone-400 font-mono">02</span>
+          </div>
+
+          <!-- Vehicle Selection Grid -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-3">
+              <label class="block text-xs uppercase tracking-widest text-forest font-medium">
+                Select Dedicated Private Vehicle *
+              </label>
+              <span class="text-[10px] text-stone-500">Includes Chauffeur, Fuel & Amenities</span>
+            </div>
+            <div id="vehicles-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Dynamically populated from admin elements -->
+            </div>
+          </div>
+
+          <!-- Services Selection -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <label class="block text-xs uppercase tracking-widest text-forest font-medium">
+                Select Journey Services Needed
+              </label>
+              <span class="text-[10px] text-stone-500">Pick all required inclusions</span>
+            </div>
+            <div id="services-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Dynamically populated from admin elements -->
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: DAY-TO-DAY PROGRAM BUILDER -->
+        <div class="bg-white border border-forest/15 p-6 md:p-8 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-forest/10 pb-4 mb-6">
+            <div>
+              <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">STEP 3 OF 3</span>
+              <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Day-to-Day Program</h2>
+            </div>
+            <button
+              type="button"
+              id="btn-autofill-suggestions"
+              class="text-[10px] tracking-widest uppercase border border-gold text-gold hover:bg-gold hover:text-forest px-3.5 py-2 transition-colors inline-flex items-center gap-1.5 self-start"
+            >
+              <span>✨ AUTO-FILL SUGGESTED PROGRAM</span>
+            </button>
+          </div>
+
+          <!-- Day Navigation Tabs -->
+          <div class="overflow-x-auto pb-2 mb-6">
+            <div id="day-tabs-nav" class="flex gap-2 min-w-max">
+              <!-- Day 1, Day 2, etc. -->
+            </div>
+          </div>
+
+          <!-- Active Day Details Editor -->
+          <div id="active-day-editor" class="space-y-6 bg-ivory p-6 border border-forest/15">
+            <!-- Day Header & Title -->
+            <div class="flex items-center justify-between gap-4">
+              <span id="active-day-badge" class="font-display text-2xl text-forest font-medium">Day 1</span>
+              <input
+                type="text"
+                id="day-title-input"
+                class="flex-1 border border-forest/20 p-2.5 text-xs bg-white focus:outline-none focus:border-forest"
+                placeholder="Day Theme / Title (e.g. Arrival, Coastal Settle-in & Welcome Dinner)"
+              />
+            </div>
+
+            <!-- Hotel Stay Selection for this day -->
+            <div>
+              <div class="mb-1.5 flex items-center justify-between gap-3">
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium">
+                🏨 Hotel Stay for Night <span id="label-night-number">1</span>
+                </label>
+                <a
+                  href="/hotels/"
+                  class="shrink-0 border-b border-forest/40 pb-1 text-[10px] tracking-widest text-forest hover:border-forest hover:text-gold transition-colors"
+                >
+                  VIEW ALL ↗
+                </a>
+              </div>
+              <select id="day-hotel-select" class="w-full border border-forest/20 p-3 text-xs bg-white focus:outline-none focus:border-forest">
+                <option value="">-- No Hotel / Continue Current Stay --</option>
+                <!-- Populated dynamically -->
+              </select>
+              <div id="day-hotel-preview" class="mt-2 text-[11px] text-stone-600 italic hidden"></div>
+            </div>
+
+            <!-- Daily Service Selection -->
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                🛎️ Service Required on This Day
+              </label>
+              <select id="day-service-select" class="w-full border border-forest/20 p-3 text-xs bg-white focus:outline-none focus:border-forest">
+                <option value="">-- Flexible / Leisure at Resort --</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <!-- Activities for this Day (Multi-select) -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs uppercase tracking-widest text-forest font-medium">
+                  🏄 Experiences & Activities for This Day
+                </label>
+                <span class="text-[10px] text-stone-500">Select one or more</span>
+              </div>
+              <div id="day-activities-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-3 bg-white border border-forest/15">
+                <!-- Populated dynamically with checkboxes -->
+              </div>
+            </div>
+
+            <!-- Notes / Daily Special Wishes -->
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
+                Daily Notes, Dietary Wishes & Special Requests
+              </label>
+              <textarea
+                id="day-notes-input"
+                rows="2"
+                class="w-full border border-forest/20 p-2.5 text-xs bg-white focus:outline-none focus:border-forest"
+                placeholder="e.g. Candlelight setup at 7 PM, vegetarian preferences, anniversary cake..."
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: ITINERARY SUMMARY CARD (4/5 cols) -->
+      <div class="lg:col-span-5 xl:col-span-4">
+        <div class="sticky top-28 space-y-6">
+
+          <!-- LIVE SUMMARY CARD -->
+          <div class="bg-forest text-white p-6 md:p-8 shadow-xl border border-white/10">
+            <div class="flex items-center justify-between border-b border-white/15 pb-4 mb-5">
+              <div>
+                <span class="text-[9px] tracking-widest uppercase text-gold font-semibold">ITINERARY OVERVIEW</span>
+                <h3 id="summary-title" class="font-display text-2xl text-white mt-1 leading-snug">My Bespoke Bali & Beyond</h3>
+              </div>
+              <span id="summary-status-badge" class="bg-white/10 text-gold border border-gold/30 px-2 py-0.5 text-[9px] tracking-widest uppercase">
+                DRAFT
+              </span>
+            </div>
+
+            <!-- Key Info List -->
+            <div class="space-y-3 text-xs">
+              <div class="flex justify-between py-1.5 border-b border-white/10">
+                <span class="text-white/60">Duration:</span>
+                <span id="summary-duration" class="font-medium text-white">5 Days / 4 Nights</span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-white/10">
+                <span class="text-white/60">Travellers:</span>
+                <span id="summary-travellers" class="font-medium text-white">2 Adults</span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-white/10">
+                <span class="text-white/60">Selected Car:</span>
+                <span id="summary-vehicle" class="font-medium text-gold text-right truncate max-w-[180px]">None</span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-white/10">
+                <span class="text-white/60">Services:</span>
+                <span id="summary-services-count" class="font-medium text-white">0 selected</span>
+              </div>
+            </div>
+
+            <!-- Day-by-Day Mini Timeline -->
+            <div class="mt-6 pt-4 border-t border-white/15">
+              <span class="text-[9px] tracking-widest uppercase text-white/50 block mb-3">SCHEDULE PREVIEW</span>
+              <div id="summary-days-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1 text-xs">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Price & Reservation Notice -->
+            <div class="mt-6 pt-4 border-t border-white/15 bg-white/5 p-3.5 border border-white/10 text-center">
+              <span class="text-[9px] tracking-widest text-gold uppercase block">PRICE ESTIMATE</span>
+              <p class="font-display text-lg text-white mt-0.5">Bespoke Quotation On Request</p>
+              <p class="text-[10px] text-white/60 mt-1 leading-relaxed">
+                Submit your itinerary to our reservation team to receive official pricing tailored to your travel dates and privileges.
+              </p>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="mt-6 space-y-3 pt-2">
+              <!-- Save to Profile -->
+              <button
+                type="button"
+                id="btn-save-profile"
+                class="w-full bg-gold text-forest py-3 px-4 text-xs tracking-widest uppercase font-semibold hover:bg-gold/90 transition-colors flex items-center justify-center gap-2 shadow-sm"
+              >
+                <span>💾 SAVE TO PROFILE</span>
+              </button>
+
+              <div class="grid grid-cols-2 gap-2">
+                <!-- Generate PDF -->
+                <button
+                  type="button"
+                  id="btn-generate-pdf"
+                  class="w-full border border-white/40 text-white hover:bg-white hover:text-forest py-3 px-2 text-[10px] tracking-widest uppercase transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <span>📄 PRINT / PDF</span>
+                </button>
+
+                <!-- Submit to Reservation -->
+                <button
+                  type="button"
+                  id="btn-submit-reservation"
+                  class="w-full bg-white text-forest hover:bg-ivory py-3 px-2 text-[10px] tracking-widest uppercase font-semibold transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <span>📩 SUBMIT</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Need Assistance Box -->
+          <div class="bg-sand/40 border border-forest/15 p-5 text-xs text-stone-600">
+            <span class="text-[9px] tracking-widest text-gold font-semibold uppercase block mb-1">PERSONAL CONCIERGE</span>
+            <p class="text-xs leading-relaxed">
+              Have specific villas, private helicopter transfers, or celebratory occasions in mind? Submit your itinerary or reach our team directly at <a href="/contact/" class="underline text-forest font-medium">Contact Us</a>.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SUBMISSION CONFIRMATION MODAL -->
+  <div id="submit-modal" class="fixed inset-0 z-[99999] bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-ivory border border-forest/20 shadow-2xl max-w-lg w-full p-6 md:p-8 relative text-center">
+      <div class="w-14 h-14 mx-auto rounded-full bg-forest text-gold flex items-center justify-center text-2xl mb-4">
+        ✓
+      </div>
+      <span class="text-[9px] tracking-widest text-gold uppercase font-semibold">ITINERARY READY TO SHARE</span>
+      <h3 class="font-display text-3xl text-forest mt-1">Thank You!</h3>
+      <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+        Choose WhatsApp or email to share your itinerary with our reservation team. Your details are prepared for you.
+      </p>
+
+      <div class="bg-white border border-forest/15 p-4 my-6 text-left space-y-1.5 text-xs">
+        <div class="flex justify-between">
+          <span class="text-stone-500">Reference Code:</span>
+          <span id="modal-ref-code" class="font-mono font-bold text-forest text-sm">TU-RES-XXXXX</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Lead Guest:</span>
+          <span id="modal-guest-name" class="font-medium text-forest">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Duration:</span>
+          <span id="modal-duration" class="font-medium text-forest">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Status:</span>
+          <span class="font-medium text-gold">Ready to share</span>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-2">
+          <a
+            id="btn-whatsapp-chat"
+            href="#"
+            target="_blank"
+            class="block w-full bg-[#25D366] border border-forest/30 text-forest py-3 px-2 text-[10px] tracking-widest uppercase font-semibold hover:border-forest transition-opacity flex items-center justify-center gap-1.5"
+          >
+            <span>💬 WHATSAPP</span>
+          </a>
+          <a
+            id="btn-email-reservation"
+            href="#"
+            class="block w-full bg-white border border-forest/30 text-forest py-3 px-2 text-[10px] tracking-widest uppercase font-semibold hover:bg-sand transition-colors flex items-center justify-center gap-1.5"
+          >
+            <span>✉️ SEND VIA EMAIL</span>
+          </a>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            id="modal-btn-print"
+            class="border border-forest/30 text-forest py-2.5 text-xs tracking-widest uppercase hover:border-forest transition-colors"
+          >
+            PRINT / SAVE PDF
+          </button>
+          <a
+            href="/profile/"
+            class="border border-forest/30 text-forest py-2.5 text-xs tracking-widest uppercase hover:border-forest transition-colors"
+          >
+            VIEW IN PROFILE ↗
+          </a>
+        </div>
+      </div>
+
+      <button id="modal-submit-close" class="absolute top-4 right-4 text-stone-400 hover:text-forest text-xl leading-none">&times;</button>
+    </div>
+  </div>
+
+  <!-- PRINTABLE DOCUMENT LAYOUT (Active during window.print) -->
+  <div id="printable-itinerary" class="hidden print:block p-8 bg-white text-black font-serif">
+    <!-- Rendered dynamically for printing -->
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="planner-toast" class="fixed bottom-6 right-6 z-[100000] bg-forest text-white px-6 py-3.5 shadow-xl text-xs tracking-widest uppercase border border-gold/40 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    Itinerary saved to profile!
+  </div>
+</BaseLayout>
+
+<style>
+  @media print {
+    :global(header),
+    :global(footer),
+    :global(nav),
+    #planner-section,
+    #submit-modal,
+    #planner-toast {
+      display: none !important;
+    }
+
+    #printable-itinerary {
+      display: block !important;
+      font-family: Georgia, serif !important;
+      color: #111 !important;
+    }
+  }
+</style>
+
+<script>
+  import {
+    getAdminElements,
+    STORAGE_KEYS,
+    getUserItineraries,
+    getUserItineraryById,
+    saveUserItinerary,
+    getUserProfile,
+    saveUserProfile,
+    generateReservationReference,
+    getContactSettings,
+    type CustomItineraryData,
+  } from "../../utils/itineraryStorage";
+
+  // Elements store
+  const adminElements = getAdminElements();
+  const userProfile = getUserProfile();
+
+  // Check URL query for existing itinerary id
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get("id");
+  let loadedItinerary: CustomItineraryData | undefined = editId ? getUserItineraryById(editId) : undefined;
+
+  // Planner State
+  let currentItineraryId = loadedItinerary?.id || `itinerary-${Date.now()}`;
+  let itineraryStatus: "draft" | "saved" | "submitted" = loadedItinerary?.status || "draft";
+  let referenceCode = loadedItinerary?.referenceCode || "";
+  let durationDays = loadedItinerary?.durationDays || 5;
+  let activeDayIndex = 0; // 0-based for Day 1
+
+  // Day data model
+  interface DayEntry {
+    dayNumber: number;
+    title: string;
+    hotelId?: string;
+    activityIds: string[];
+    serviceId?: string;
+    notes?: string;
+  }
+
+  let daysData: DayEntry[] = [];
+
+  // Initialize or load daysData
+  function initializeDaysData() {
+    if (loadedItinerary?.days && loadedItinerary.days.length > 0) {
+      daysData = loadedItinerary.days.map((d) => ({ ...d }));
+      durationDays = daysData.length;
+    } else {
+      daysData = [];
+      for (let i = 1; i <= durationDays; i++) {
+        const template = adminElements.dayTemplates.find((t) => t.dayNumber === i);
+        daysData.push({
+          dayNumber: i,
+          title: template?.title || `Day ${i}: Leisure & Exploration`,
+          hotelId: template?.suggestedHotelId || (adminElements.hotels[0]?.id || ""),
+          activityIds: template?.suggestedActivityIds || [],
+          serviceId: template?.suggestedServiceId || (i === 1 ? "srv-transfer-in" : i === durationDays ? "srv-transfer-out" : "srv-fullday-tour"),
+          notes: "",
+        });
+      }
+    }
+  }
+
+  // DOM Elements
+  const inputTitle = document.getElementById("input-title") as HTMLInputElement;
+  const inputGuestName = document.getElementById("input-guest-name") as HTMLInputElement;
+  const inputGuestEmail = document.getElementById("input-guest-email") as HTMLInputElement;
+  const inputGuestPhone = document.getElementById("input-guest-phone") as HTMLInputElement;
+  const inputDuration = document.getElementById("input-duration") as HTMLInputElement;
+  const displayNights = document.getElementById("display-nights") as HTMLInputElement;
+  const inputStartDate = document.getElementById("input-start-date") as HTMLInputElement;
+  const inputEndDate = document.getElementById("input-end-date") as HTMLInputElement;
+  const inputAdults = document.getElementById("input-adults") as HTMLSelectElement;
+  const inputChildren = document.getElementById("input-children") as HTMLSelectElement;
+
+  const btnDurationMinus = document.getElementById("btn-duration-minus")!;
+  const btnDurationPlus = document.getElementById("btn-duration-plus")!;
+  const btnAutofill = document.getElementById("btn-autofill-suggestions")!;
+
+  const vehiclesContainer = document.getElementById("vehicles-container")!;
+  const servicesContainer = document.getElementById("services-container")!;
+  const dayTabsNav = document.getElementById("day-tabs-nav")!;
+
+  // Active day editor elements
+  const activeDayBadge = document.getElementById("active-day-badge")!;
+  const dayTitleInput = document.getElementById("day-title-input") as HTMLInputElement;
+  const dayHotelSelect = document.getElementById("day-hotel-select") as HTMLSelectElement;
+  const dayHotelPreview = document.getElementById("day-hotel-preview")!;
+  const dayServiceSelect = document.getElementById("day-service-select") as HTMLSelectElement;
+  const dayActivitiesContainer = document.getElementById("day-activities-container")!;
+  const dayNotesInput = document.getElementById("day-notes-input") as HTMLTextAreaElement;
+  const labelNightNumber = document.getElementById("label-night-number")!;
+
+  // Summary Elements
+  const summaryTitle = document.getElementById("summary-title")!;
+  const summaryStatusBadge = document.getElementById("summary-status-badge")!;
+  const summaryDuration = document.getElementById("summary-duration")!;
+  const summaryTravellers = document.getElementById("summary-travellers")!;
+  const summaryVehicle = document.getElementById("summary-vehicle")!;
+  const summaryServicesCount = document.getElementById("summary-services-count")!;
+  const summaryDaysList = document.getElementById("summary-days-list")!;
+
+  // Action Buttons
+  const btnSaveProfile = document.getElementById("btn-save-profile")!;
+  const btnGeneratePdf = document.getElementById("btn-generate-pdf")!;
+  const btnSubmitReservation = document.getElementById("btn-submit-reservation")!;
+  const plannerToast = document.getElementById("planner-toast")!;
+
+  // Modal Elements
+  const submitModal = document.getElementById("submit-modal")!;
+  const modalSubmitClose = document.getElementById("modal-submit-close")!;
+  const modalRefCode = document.getElementById("modal-ref-code")!;
+  const modalGuestName = document.getElementById("modal-guest-name")!;
+  const modalDuration = document.getElementById("modal-duration")!;
+  const btnWhatsappChat = document.getElementById("btn-whatsapp-chat") as HTMLAnchorElement;
+  const btnEmailReservation = document.getElementById("btn-email-reservation") as HTMLAnchorElement;
+  const modalBtnPrint = document.getElementById("modal-btn-print")!;
+
+  let selectedVehicleId = loadedItinerary?.selectedVehicleId || (adminElements.vehicles[0]?.id || "");
+  let selectedServices: string[] = loadedItinerary?.selectedServices || ["srv-transfer-in", "srv-transfer-out", "srv-fullday-tour"];
+
+  function showToast(msg: string) {
+    if (!plannerToast) return;
+    plannerToast.textContent = msg;
+    plannerToast.classList.remove("translate-y-20", "opacity-0");
+    setTimeout(() => {
+      plannerToast.classList.add("translate-y-20", "opacity-0");
+    }, 2800);
+  }
+
+  // Populate guest info if available
+  if (loadedItinerary) {
+    inputTitle.value = loadedItinerary.title;
+    inputGuestName.value = loadedItinerary.guest.name || "";
+    inputGuestEmail.value = loadedItinerary.guest.email || "";
+    inputGuestPhone.value = loadedItinerary.guest.phone || "";
+    if (loadedItinerary.startDate) inputStartDate.value = loadedItinerary.startDate;
+    if (loadedItinerary.endDate) inputEndDate.value = loadedItinerary.endDate;
+    inputAdults.value = String(loadedItinerary.travellers.adults || 2);
+    inputChildren.value = String(loadedItinerary.travellers.children || 0);
+  } else if (userProfile.name) {
+    inputGuestName.value = userProfile.name;
+    inputGuestEmail.value = userProfile.email;
+    inputGuestPhone.value = userProfile.phone;
+  }
+
+  // ── Pre-fill from event deep-link (?event=...&location=...) ───────────
+  const eventParam    = urlParams.get("event");
+  const locationParam = urlParams.get("location");
+  if (eventParam && !editId) {
+    // Set itinerary title
+    inputTitle.value = `Journey for ${eventParam}`;
+    // Pre-fill Day 1 notes with event context
+    if (daysData.length > 0) {
+      daysData[0].notes = `Arrival for ${eventParam}${locationParam ? " at " + locationParam : ""}`;
+      daysData[0].title = `Day 1: Arrival — ${eventParam}`;
+    }
+  }
+
+  // ── Auto-calculate end date from start date + duration ────────────────
+  function recalcEndDate() {
+    if (!inputStartDate.value) return;
+    const start = new Date(inputStartDate.value);
+    if (isNaN(start.getTime())) return;
+    const end = new Date(start);
+    end.setDate(end.getDate() + durationDays - 1);
+    inputEndDate.value = end.toISOString().split("T")[0];
+  }
+
+  function recalcDurationFromDates() {
+    if (!inputStartDate.value || !inputEndDate.value) return;
+    const start = new Date(inputStartDate.value);
+    const end   = new Date(inputEndDate.value);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+    const diffDays = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+    if (diffDays >= 1 && diffDays <= 30) {
+      durationDays = diffDays;
+      updateDurationDisplay();
+      initializeDaysData();
+      renderDayTabs();
+      renderActiveDay();
+      updateSummary();
+    }
+  }
+
+  inputStartDate.addEventListener("change", recalcEndDate);
+  inputEndDate.addEventListener("change", recalcDurationFromDates);
+
+  // Initial Days Setup
+  initializeDaysData();
+  updateDurationDisplay();
+
+  // Render Vehicles
+  function renderVehicles() {
+    vehiclesContainer.innerHTML = "";
+    adminElements.vehicles.forEach((veh) => {
+      const isSelected = veh.id === selectedVehicleId;
+      const card = document.createElement("div");
+      card.className = `p-4 border cursor-pointer transition-all ${
+        isSelected ? "border-forest bg-forest/5 shadow-md ring-1 ring-forest" : "border-forest/15 hover:border-forest/40 bg-white"
+      }`;
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[9px] tracking-widest text-gold uppercase font-semibold">${veh.category}</span>
+          <span class="text-xs font-bold ${isSelected ? "text-forest" : "text-stone-400"}">${isSelected ? "✓ SELECTED" : "SELECT"}</span>
+        </div>
+        <h4 class="font-display text-lg text-forest font-medium leading-snug">${veh.name}</h4>
+        <div class="flex items-center gap-3 text-xs text-stone-600 mt-1 mb-2">
+          <span>👥 Max ${veh.capacityPax} Pax</span>
+          <span>🧳 ${veh.capacityLuggage} Bags</span>
+        </div>
+        <p class="text-[11px] text-stone-500 line-clamp-2">${veh.description}</p>
+      `;
+      card.addEventListener("click", () => {
+        selectedVehicleId = veh.id;
+        renderVehicles();
+        updateSummary();
+      });
+      vehiclesContainer.appendChild(card);
+    });
+  }
+
+  // Render Services Checkboxes
+  function renderServices() {
+    servicesContainer.innerHTML = "";
+    adminElements.services.forEach((srv) => {
+      const isChecked = selectedServices.includes(srv.id);
+      const item = document.createElement("label");
+      item.className = `flex items-start gap-3 p-3 border cursor-pointer transition-colors ${
+        isChecked ? "border-forest bg-forest/5" : "border-forest/15 hover:border-forest/30 bg-white"
+      }`;
+      item.innerHTML = `
+        <input type="checkbox" class="mt-0.5 accent-[#23382f]" value="${srv.id}" ${isChecked ? "checked" : ""} />
+        <div>
+          <span class="block text-xs font-medium text-forest">${srv.name}</span>
+          <span class="block text-[11px] text-stone-500 mt-0.5 line-clamp-1">${srv.description}</span>
+        </div>
+      `;
+      const checkbox = item.querySelector("input")!;
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          if (!selectedServices.includes(srv.id)) selectedServices.push(srv.id);
+        } else {
+          selectedServices = selectedServices.filter((id) => id !== srv.id);
+        }
+        renderServices();
+        updateSummary();
+      });
+      servicesContainer.appendChild(item);
+    });
+  }
+
+  // Render Day Tabs Navigation
+  function renderDayTabs() {
+    dayTabsNav.innerHTML = "";
+    daysData.forEach((d, idx) => {
+      const isActive = idx === activeDayIndex;
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = `px-4 py-2 text-xs uppercase tracking-wider font-medium border transition-all ${
+        isActive
+          ? "border-forest bg-forest text-white shadow-sm"
+          : "border-forest/20 text-forest/70 hover:border-forest hover:text-forest bg-white"
+      }`;
+      tab.textContent = `Day ${d.dayNumber}`;
+      tab.addEventListener("click", () => {
+        saveCurrentDayForm();
+        activeDayIndex = idx;
+        renderDayTabs();
+        loadActiveDayForm();
+      });
+      dayTabsNav.appendChild(tab);
+    });
+  }
+
+  // Populate Dropdowns in Active Day Editor
+  function setupDayDropdowns() {
+    // Hotels dropdown
+    dayHotelSelect.innerHTML = `<option value="">-- No Hotel / Continue Current Stay --</option>`;
+    adminElements.hotels.forEach((h) => {
+      const opt = document.createElement("option");
+      opt.value = h.id;
+      opt.textContent = `${h.name} (${h.location})`;
+      dayHotelSelect.appendChild(opt);
+    });
+
+    // Services dropdown
+    dayServiceSelect.innerHTML = `<option value="">-- Flexible / Leisure at Resort --</option>`;
+    adminElements.services.forEach((s) => {
+      const opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = s.name;
+      dayServiceSelect.appendChild(opt);
+    });
+  }
+
+  // Load Active Day Data into Form
+  function loadActiveDayForm() {
+    const cur = daysData[activeDayIndex];
+    if (!cur) return;
+
+    activeDayBadge.textContent = `Day ${cur.dayNumber}`;
+    labelNightNumber.textContent = String(cur.dayNumber);
+    dayTitleInput.value = cur.title || "";
+    dayHotelSelect.value = cur.hotelId || "";
+    dayServiceSelect.value = cur.serviceId || "";
+    dayNotesInput.value = cur.notes || "";
+
+    // Hotel Preview text
+    updateHotelPreview(cur.hotelId);
+
+    // Populate Activities Checkboxes for active day
+    dayActivitiesContainer.innerHTML = "";
+    adminElements.activities.forEach((act) => {
+      const isChecked = (cur.activityIds || []).includes(act.id);
+      const label = document.createElement("label");
+      label.className = `flex items-start gap-2.5 p-2 text-xs border cursor-pointer hover:bg-forest/5 ${
+        isChecked ? "border-forest bg-forest/5 font-medium text-forest" : "border-stone-200 text-stone-600"
+      }`;
+      label.innerHTML = `
+        <input type="checkbox" class="mt-0.5 accent-[#23382f]" value="${act.id}" ${isChecked ? "checked" : ""} />
+        <div>
+          <span class="block">${act.title}</span>
+          <span class="block text-[10px] text-stone-400">⏱ ${act.duration} • 📍 ${act.location}</span>
+        </div>
+      `;
+      const chk = label.querySelector("input")!;
+      chk.addEventListener("change", () => {
+        saveCurrentDayForm();
+        updateSummary();
+      });
+      dayActivitiesContainer.appendChild(label);
+    });
+  }
+
+  function refreshActivitiesFromStorage() {
+    saveCurrentDayForm();
+    adminElements.activities = getAdminElements().activities;
+    loadActiveDayForm();
+    updateSummary();
+  }
+
+  window.addEventListener("tria_uma_elements_updated", refreshActivitiesFromStorage);
+  window.addEventListener("storage", (event) => {
+    if (event.key === STORAGE_KEYS.ADMIN_ELEMENTS || event.key === null) {
+      refreshActivitiesFromStorage();
+    }
+  });
+
+  function updateHotelPreview(hotelId?: string) {
+    if (!hotelId) {
+      dayHotelPreview.classList.add("hidden");
+      return;
+    }
+    const h = adminElements.hotels.find((x) => x.id === hotelId);
+    if (h) {
+      dayHotelPreview.textContent = `Selected: ${h.name} • ${h.category} • ${h.location}`;
+      dayHotelPreview.classList.remove("hidden");
+    } else {
+      dayHotelPreview.classList.add("hidden");
+    }
+  }
+
+  dayHotelSelect.addEventListener("change", () => {
+    updateHotelPreview(dayHotelSelect.value);
+    saveCurrentDayForm();
+    updateSummary();
+  });
+
+  dayServiceSelect.addEventListener("change", () => {
+    saveCurrentDayForm();
+    updateSummary();
+  });
+
+  dayTitleInput.addEventListener("input", () => {
+    saveCurrentDayForm();
+    updateSummary();
+  });
+
+  dayNotesInput.addEventListener("input", () => {
+    saveCurrentDayForm();
+  });
+
+  // Save current active day form into daysData array
+  function saveCurrentDayForm() {
+    const cur = daysData[activeDayIndex];
+    if (!cur) return;
+
+    cur.title = dayTitleInput.value.trim() || `Day ${cur.dayNumber}: Bespoke Program`;
+    cur.hotelId = dayHotelSelect.value;
+    cur.serviceId = dayServiceSelect.value;
+    cur.notes = dayNotesInput.value.trim();
+
+    // Collect checked activities
+    const checkedActivities: string[] = [];
+    dayActivitiesContainer.querySelectorAll<HTMLInputElement>("input:checked").forEach((chk) => {
+      checkedActivities.push(chk.value);
+    });
+    cur.activityIds = checkedActivities;
+  }
+
+  // Duration changes
+  function updateDurationDisplay() {
+    inputDuration.value = String(durationDays);
+    displayNights.value = `${Math.max(0, durationDays - 1)} Nights`;
+
+    // Adjust daysData array size
+    if (daysData.length < durationDays) {
+      for (let i = daysData.length + 1; i <= durationDays; i++) {
+        const template = adminElements.dayTemplates.find((t) => t.dayNumber === i);
+        daysData.push({
+          dayNumber: i,
+          title: template?.title || `Day ${i}: Tailor-Made Program`,
+          hotelId: template?.suggestedHotelId || (daysData[i - 2]?.hotelId || ""),
+          activityIds: template?.suggestedActivityIds || [],
+          serviceId: i === durationDays ? "srv-transfer-out" : "srv-fullday-tour",
+          notes: "",
+        });
+      }
+    } else if (daysData.length > durationDays) {
+      daysData = daysData.slice(0, durationDays);
+      if (activeDayIndex >= durationDays) {
+        activeDayIndex = durationDays - 1;
+      }
+    }
+
+    renderDayTabs();
+    loadActiveDayForm();
+    updateSummary();
+  }
+
+  btnDurationMinus.addEventListener("click", () => {
+    if (durationDays > 1) {
+      saveCurrentDayForm();
+      durationDays--;
+      updateDurationDisplay();
+    }
+  });
+
+  btnDurationPlus.addEventListener("click", () => {
+    if (durationDays < 30) {
+      saveCurrentDayForm();
+      durationDays++;
+      updateDurationDisplay();
+    }
+  });
+
+  inputDuration.addEventListener("change", () => {
+    const val = parseInt(inputDuration.value, 10);
+    if (!isNaN(val) && val >= 1 && val <= 30) {
+      saveCurrentDayForm();
+      durationDays = val;
+      updateDurationDisplay();
+    }
+  });
+
+  // Auto-fill template suggestions
+  btnAutofill.addEventListener("click", () => {
+    if (!confirm("Auto-fill day-by-day itinerary with curated recommendations from admin templates?")) return;
+    daysData.forEach((day) => {
+      const tpl = adminElements.dayTemplates.find((t) => t.dayNumber === day.dayNumber);
+      if (tpl) {
+        day.title = tpl.title;
+        if (tpl.suggestedHotelId) day.hotelId = tpl.suggestedHotelId;
+        if (tpl.suggestedActivityIds) day.activityIds = [...tpl.suggestedActivityIds];
+        if (tpl.suggestedServiceId) day.serviceId = tpl.suggestedServiceId;
+      }
+    });
+    loadActiveDayForm();
+    updateSummary();
+    showToast("Program auto-filled with curated suggestions!");
+  });
+
+  // Summary Update
+  function updateSummary() {
+    const titleVal = inputTitle.value.trim() || "My Bespoke Bali & Beyond";
+    summaryTitle.textContent = titleVal;
+
+    summaryStatusBadge.textContent = itineraryStatus.toUpperCase();
+    if (itineraryStatus === "submitted") {
+      summaryStatusBadge.className = "bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/40 px-2 py-0.5 text-[9px] tracking-widest uppercase";
+    } else if (itineraryStatus === "saved") {
+      summaryStatusBadge.className = "bg-gold/20 text-gold border border-gold/40 px-2 py-0.5 text-[9px] tracking-widest uppercase";
+    }
+
+    summaryDuration.textContent = `${durationDays} Days / ${Math.max(0, durationDays - 1)} Nights`;
+    summaryTravellers.textContent = `${inputAdults.value} Adults${Number(inputChildren.value) > 0 ? `, ${inputChildren.value} Children` : ""}`;
+
+    const veh = adminElements.vehicles.find((v) => v.id === selectedVehicleId);
+    summaryVehicle.textContent = veh ? veh.name : "None selected";
+
+    summaryServicesCount.textContent = `${selectedServices.length} selected`;
+
+    // Render Timeline in summary
+    summaryDaysList.innerHTML = "";
+    daysData.forEach((d) => {
+      const hotel = adminElements.hotels.find((h) => h.id === d.hotelId);
+      const acts = adminElements.activities.filter((a) => (d.activityIds || []).includes(a.id));
+      const srv = adminElements.services.find((s) => s.id === d.serviceId);
+
+      const dayRow = document.createElement("div");
+      dayRow.className = "p-2 bg-white/5 border border-white/10 rounded-sm";
+      dayRow.innerHTML = `
+        <div class="flex items-center justify-between font-semibold text-white">
+          <span>Day ${d.dayNumber}: ${d.title}</span>
+        </div>
+        <div class="mt-1 space-y-0.5 text-[11px] text-white/70">
+          ${hotel ? `<div class="truncate">🏨 ${hotel.name}</div>` : ""}
+          ${srv ? `<div class="truncate">🛎️ ${srv.name}</div>` : ""}
+          ${acts.length > 0 ? `<div class="truncate text-gold">🏄 ${acts.map((a) => a.title).join(", ")}</div>` : ""}
+        </div>
+      `;
+      summaryDaysList.appendChild(dayRow);
+    });
+  }
+
+  inputTitle.addEventListener("input", updateSummary);
+  inputAdults.addEventListener("change", updateSummary);
+  inputChildren.addEventListener("change", updateSummary);
+
+  // Compile Itinerary Object
+  function compileItineraryData(): CustomItineraryData {
+    saveCurrentDayForm();
+    const guestName = inputGuestName.value.trim() || "Valued Guest";
+    const guestEmail = inputGuestEmail.value.trim();
+    const guestPhone = inputGuestPhone.value.trim();
+
+    return {
+      id: currentItineraryId,
+      createdAt: loadedItinerary?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      status: itineraryStatus,
+      referenceCode: referenceCode || undefined,
+      title: inputTitle.value.trim() || "My Bespoke Bali & Beyond",
+      guest: {
+        name: guestName,
+        email: guestEmail,
+        phone: guestPhone,
+      },
+      durationDays,
+      durationNights: Math.max(0, durationDays - 1),
+      startDate: inputStartDate.value || undefined,
+      endDate: inputEndDate.value || undefined,
+      travellers: {
+        adults: parseInt(inputAdults.value, 10) || 2,
+        children: parseInt(inputChildren.value, 10) || 0,
+      },
+      selectedVehicleId,
+      selectedServices: [...selectedServices],
+      days: daysData.map((d) => ({ ...d })),
+    };
+  }
+
+  // Save to Profile Handler
+  btnSaveProfile.addEventListener("click", () => {
+    saveCurrentDayForm();
+    if (itineraryStatus === "draft") {
+      itineraryStatus = "saved";
+    }
+    const data = compileItineraryData();
+    saveUserItinerary(data);
+
+    // Save profile contact info for convenience
+    if (data.guest.name || data.guest.email) {
+      saveUserProfile({
+        name: data.guest.name,
+        email: data.guest.email,
+        phone: data.guest.phone,
+      });
+    }
+
+    updateSummary();
+    showToast("Itinerary saved to your Profile!");
+  });
+
+  // Submit to Reservation Handler
+  btnSubmitReservation.addEventListener("click", () => {
+    saveCurrentDayForm();
+
+    const guestName = inputGuestName.value.trim();
+    const guestEmail = inputGuestEmail.value.trim();
+    const guestPhone = inputGuestPhone.value.trim();
+
+    if (!guestName || !guestEmail || !guestPhone) {
+      alert("Please enter Lead Guest Name, Email, and Phone / WhatsApp before submitting to reservation.");
+      inputGuestName.focus();
+      return;
+    }
+
+    if (!referenceCode) {
+      referenceCode = generateReservationReference();
+    }
+    itineraryStatus = "submitted";
+
+    const data = compileItineraryData();
+    saveUserItinerary(data);
+    updateSummary();
+
+    // Populate modal
+    modalRefCode.textContent = referenceCode;
+    modalGuestName.textContent = data.guest.name;
+    modalDuration.textContent = `${data.durationDays} Days / ${data.durationNights} Nights`;
+
+    // Prepare the same itinerary summary for WhatsApp and email.
+    const veh = adminElements.vehicles.find((v) => v.id === selectedVehicleId);
+    const contact = getContactSettings();
+    const formatDate = (date: string | undefined) => date
+      ? new Date(`${date}T00:00:00`).toLocaleDateString("en-GB")
+      : "Not specified";
+    const itineraryDays = data.days.map((day) => {
+      const hotel = adminElements.hotels.find((item) => item.id === day.hotelId);
+      const service = adminElements.services.find((item) => item.id === day.serviceId);
+      const activities = adminElements.activities
+        .filter((item) => (day.activityIds || []).includes(item.id))
+        .map((item) => item.title);
+      return [
+        `Day ${day.dayNumber}: ${day.title}`,
+        hotel ? `Hotel: ${hotel.name} (${hotel.location})` : "",
+        service ? `Service: ${service.name}` : "",
+        activities.length ? `Experiences: ${activities.join(", ")}` : "",
+        day.notes ? `Notes: ${day.notes}` : "",
+      ].filter(Boolean).join("\n");
+    }).join("\n\n");
+    const selectedServiceNames = adminElements.services
+      .filter((service) => data.selectedServices.includes(service.id))
+      .map((service) => service.name);
+    const travellerSummary = `${data.travellers.adults} Adults${data.travellers.children ? `, ${data.travellers.children} Children` : ""}`;
+    const whatsappMessage = [
+      `Hello ${contact.companyName} Reservation Team,`,
+      "",
+      "*QUOTATION REQUEST*",
+      `*Reference:* ${referenceCode}`,
+      `*Itinerary:* _${data.title}_`,
+      `*Lead guest:* ${data.guest.name}`,
+      `*Email:* ${data.guest.email}`,
+      `*Phone / WhatsApp:* ${data.guest.phone}`,
+      `*Travel dates:* ${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
+      `*Duration:* ${data.durationDays} Days / ${data.durationNights} Nights`,
+      `*Travellers:* ${travellerSummary}`,
+      `*Vehicle:* ${veh?.name || "None selected"}`,
+      `*Selected services:* ${selectedServiceNames.join(", ") || "None selected"}`,
+      "",
+      "*DAY-TO-DAY ITINERARY*",
+      itineraryDays,
+      "",
+      "_Please advise availability and prepare a formal quotation. Thank you._",
+    ].join("\n");
+    const emailMessage = [
+      `HELLO ${contact.companyName.toUpperCase()} RESERVATION TEAM,`,
+      "",
+      "QUOTATION REQUEST",
+      "=================",
+      `REFERENCE: ${referenceCode}`,
+      `ITINERARY: ${data.title}`,
+      `LEAD GUEST: ${data.guest.name}`,
+      `EMAIL: ${data.guest.email}`,
+      `PHONE / WHATSAPP: ${data.guest.phone}`,
+      `TRAVEL DATES: ${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
+      `DURATION: ${data.durationDays} Days / ${data.durationNights} Nights`,
+      `TRAVELLERS: ${travellerSummary}`,
+      `VEHICLE: ${veh?.name || "None selected"}`,
+      `SELECTED SERVICES: ${selectedServiceNames.join(", ") || "None selected"}`,
+      "",
+      "DAY-TO-DAY ITINERARY",
+      "--------------------",
+      itineraryDays,
+      "",
+      "Please advise availability and prepare a formal quotation. Thank you.",
+    ].join("\n");
+    btnWhatsappChat.href = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+    btnEmailReservation.href = `mailto:${encodeURIComponent(contact.reservationEmail)}?subject=${encodeURIComponent(`Reservation request ${referenceCode} - ${data.guest.name}`)}&body=${encodeURIComponent(emailMessage)}`;
+
+    submitModal.classList.remove("hidden");
+    submitModal.classList.add("flex");
+  });
+
+  modalSubmitClose.addEventListener("click", () => {
+    submitModal.classList.add("hidden");
+    submitModal.classList.remove("flex");
+  });
+
+  // Print / PDF Generation
+  function generateAndPrintPDF() {
+    saveCurrentDayForm();
+    const data = compileItineraryData();
+    const printableContainer = document.getElementById("printable-itinerary")!;
+    const veh = adminElements.vehicles.find((v) => v.id === data.selectedVehicleId);
+    const servicesList = adminElements.services
+      .filter((s) => data.selectedServices.includes(s.id))
+      .map((s) => s.name)
+      .join(", ");
+
+    let daysHtml = "";
+    data.days.forEach((day) => {
+      const hotel = adminElements.hotels.find((h) => h.id === day.hotelId);
+      const acts = adminElements.activities.filter((a) => (day.activityIds || []).includes(a.id));
+      const srv = adminElements.services.find((s) => s.id === day.serviceId);
+
+      daysHtml += `
+        <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #ddd;">
+          <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #23382f;">Day ${day.dayNumber}: ${day.title}</h3>
+          <div style="font-size: 13px; line-height: 1.6; color: #444;">
+            ${hotel ? `<div><strong>Hotel Stay:</strong> ${hotel.name} (${hotel.location}) - <em>${hotel.category}</em></div>` : ""}
+            ${srv ? `<div><strong>Day Service:</strong> ${srv.name}</div>` : ""}
+            ${acts.length > 0 ? `<div><strong>Curated Experiences:</strong> ${acts.map((a) => a.title).join("; ")}</div>` : ""}
+            ${day.notes ? `<div><strong>Notes & Preferences:</strong> ${day.notes}</div>` : ""}
+          </div>
+        </div>
+      `;
+    });
+
+    printableContainer.innerHTML = `
+      <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #23382f; padding-bottom: 16px; margin-bottom: 24px;">
+          <div>
+            <h1 style="margin: 0; font-size: 28px; letter-spacing: 2px; color: #23382f;">TRIA UMA</h1>
+            <p style="margin: 4px 0 0 0; font-size: 10px; letter-spacing: 3px; color: #777;">LUXURY TRAVEL COLLECTION</p>
+          </div>
+          <div style="text-align: right; font-size: 12px; color: #555;">
+            <div><strong>Reference:</strong> ${data.referenceCode || "DRAFT PROPOSAL"}</div>
+            <div><strong>Date:</strong> ${new Date().toLocaleDateString("en-GB")}</div>
+            <div><strong>Status:</strong> ${data.status.toUpperCase()}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #a78a63; text-transform: uppercase;">TAILOR-MADE ITINERARY</span>
+          <h2 style="margin: 6px 0 12px 0; font-size: 24px; color: #23382f;">${data.title}</h2>
+          
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; background: #faf9f6;">
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Lead Guest:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${data.guest.name} (${data.guest.phone || "N/A"})</td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Duration:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${data.durationDays} Days / ${data.durationNights} Nights</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Travellers:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${data.travellers.adults} Adults${data.travellers.children ? `, ${data.travellers.children} Children` : ""}</td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Private Vehicle:</strong></td>
+              <td style="padding: 8px; border: 1px solid #e0ded8;">${veh ? veh.name : "To be assigned"}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0ded8;"><strong>Services Included:</strong></td>
+              <td colspan="3" style="padding: 8px; border: 1px solid #e0ded8;">${servicesList || "Standard bespoke chauffeur services"}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h3 style="border-bottom: 1px solid #23382f; padding-bottom: 6px; font-size: 16px; letter-spacing: 1px; color: #23382f; text-transform: uppercase;">Day-to-Day Itinerary Schedule</h3>
+          <div style="margin-top: 16px;">
+            ${daysHtml}
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid #23382f; padding-top: 16px; font-size: 11px; color: #666; line-height: 1.6;">
+          <p><strong>Note on Pricing & Inclusions:</strong> This bespoke itinerary is prepared on request. Quotation is finalized based on confirmed travel dates, high/peak season surcharges, and personalized inclusions. To finalize your reservation, contact <em>reservation@triauma.com</em> or WhatsApp <em>+62 812 3456 7890</em>.</p>
+          <p style="text-align: center; margin-top: 16px; color: #999;">Tria Uma Luxury Travel Collection • Crafted for extraordinary journeys</p>
+        </div>
+      </div>
+    `;
+
+    window.print();
+  }
+
+  btnGeneratePdf.addEventListener("click", generateAndPrintPDF);
+  modalBtnPrint.addEventListener("click", generateAndPrintPDF);
+
+  // Initial runs
+  renderVehicles();
+  renderServices();
+  setupDayDropdowns();
+  renderDayTabs();
+  loadActiveDayForm();
+  updateSummary();
+</script>

@@ -1,0 +1,494 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import ContentCard from "../components/ContentCard.astro";
+import { hotels, journal, plans, offers } from "../data/content";
+import { defaultEvents, defaultSiteContent } from "../utils/siteContentStorage";
+
+const baliJournalSlugs = new Set(["slow-days-in-bali", "sacred-bali", "beyond-the-beaches", "a-balinese-table"]);
+const featuredJournal = [...journal.filter((item) => baliJournalSlugs.has(item.slug)), ...journal.filter((item) => !baliJournalSlugs.has(item.slug))].slice(0, 4);
+const featuredHotels = hotels.slice(0, 3);
+const featuredPlans = plans.slice(0, 6);
+const featuredEvents = defaultEvents.slice(0, 3);
+const general = defaultSiteContent.general;
+---
+
+<BaseLayout
+  title="Tria Uma | Tailor-Made Luxury Journeys"
+  description="Explore extraordinary destinations, exceptional hotels, and tailor-made luxury journeys."
+>
+  <Hero
+    eyebrow={general.heroEyebrow}
+    title={general.heroTitle}
+    subtitle={general.heroSubtitle}
+    image={general.heroImage}
+    videoUrl={general.heroVideoUrl}
+    mediaType={general.heroMediaType}
+  />
+
+  <!-- EVENT DETAIL MODAL DIALOG -->
+  <div id="event-detail-modal" class="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-ivory border border-forest/20 shadow-2xl max-w-2xl w-full my-8 relative overflow-hidden text-left">
+      
+      <!-- Close Button -->
+      <button
+        id="btn-close-event-modal"
+        type="button"
+        class="absolute top-4 right-4 z-20 text-white bg-forest/80 hover:bg-forest rounded-full w-9 h-9 flex items-center justify-center text-xl transition-colors shadow-md"
+        aria-label="Close modal"
+      >
+        &times;
+      </button>
+
+      <!-- Event Image Banner -->
+      <div class="h-60 sm:h-72 w-full overflow-hidden relative bg-sand">
+        <img id="modal-event-image" src="" alt="" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+        <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+          <span id="modal-event-badge" class="text-[9px] tracking-widest px-2.5 py-1 uppercase border font-semibold backdrop-blur-md bg-white text-forest">
+            STATUS
+          </span>
+          <span id="modal-event-category" class="bg-forest/90 text-white text-[9px] tracking-widest px-2.5 py-1 uppercase backdrop-blur-md">
+            CATEGORY
+          </span>
+        </div>
+        <div class="absolute bottom-4 left-4 right-4 text-white">
+          <span id="modal-event-date" class="text-xs text-gold font-semibold uppercase tracking-wider block mb-1">
+            DATE
+          </span>
+          <h3 id="modal-event-title" class="font-display text-2xl sm:text-3xl leading-snug">
+            Event Title
+          </h3>
+        </div>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="p-6 sm:p-8 space-y-6">
+        <!-- Location and Meta -->
+        <div class="flex items-center gap-2 text-xs text-stone-600 bg-sand/30 p-3.5 border border-forest/10">
+          <span class="text-lg">📍</span>
+          <div>
+            <span class="font-semibold text-forest uppercase tracking-wider text-[10px] block">Venue & Location</span>
+            <span id="modal-event-location" class="font-medium text-stone-800">Location</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <span class="text-[10px] tracking-widest text-gold uppercase font-semibold block mb-2">ABOUT THE EVENT</span>
+          <p id="modal-event-description" class="text-xs sm:text-sm text-stone-700 leading-relaxed">
+            Description
+          </p>
+        </div>
+
+        <!-- Travel Inclusions Box -->
+        <div class="bg-forest text-white p-5 border border-white/10 space-y-2">
+          <span class="text-[9px] tracking-widest uppercase text-gold font-semibold block">TRIA UMA TRAVEL CONCIERGE ASSISTANCE</span>
+          <p class="text-xs text-white/80 leading-relaxed">
+            Planning to participate or attend this event? Tria Uma arranges dedicated airport VIP transfers, private luxury chauffeur services (Toyota Alphard / Innova Zenix), five-star hotel bookings, and bespoke post-event excursions.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-4 border-t border-forest/15 flex flex-col sm:flex-row gap-3">
+          <a
+            id="modal-btn-plan-trip"
+            href="/plan-your-journey/"
+            class="flex-1 bg-forest text-white hover:bg-forest/90 py-3.5 px-4 text-xs tracking-widest uppercase font-semibold text-center transition-colors shadow-sm inline-flex items-center justify-center gap-1.5"
+          >
+            <span>PLAN TRIP FOR THIS EVENT</span>
+            <span>↗</span>
+          </a>
+
+          <a
+            id="modal-btn-whatsapp"
+            href="#"
+            target="_blank"
+            class="flex-1 bg-[#25D366] text-white hover:opacity-95 py-3.5 px-4 text-xs tracking-widest uppercase font-semibold text-center transition-opacity shadow-sm inline-flex items-center justify-center gap-1.5"
+          >
+            <span>💬 WHATSAPP INQUIRY</span>
+          </a>
+
+          <a
+            id="modal-btn-external"
+            href="#"
+            target="_blank"
+            class="hidden border border-forest/30 text-forest hover:border-forest py-3.5 px-4 text-xs tracking-widest uppercase text-center transition-colors items-center justify-center"
+          >
+            OFFICIAL SITE ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Philosophy Section -->
+  <section class="container-editorial py-24 md:py-36">
+    <div class="mx-auto max-w-4xl text-center">
+      <p class="mb-6 text-[10px] tracking-[0.3em] text-stone-500 philosophy-eyebrow">
+        A DIFFERENT WAY TO TRAVEL
+      </p>
+      <h2 class="editorial-title text-5xl md:text-7xl philosophy-title">
+        Luxury is the freedom to travel your own way.
+      </h2>
+      <p class="mx-auto mt-7 max-w-4xl text-sm leading-8 text-stone-600 philosophy-text">
+        The finest journeys begin with listening. We bring together remarkable stays,
+        local knowledge, and thoughtful details to create travel that feels personal
+        from the very first moment to the last.
+      </p>
+      <a
+        href="/about/"
+        class="mt-8 inline-block border-b border-forest/40 pb-2 text-[10px] tracking-widest"
+      >
+        DISCOVER OUR APPROACH ↗
+      </a>
+    </div>
+  </section>
+
+  <!-- CALENDAR EVENTS SECTION (Immediately Below Hero) -->
+  <section class="bg-ivory border-b border-forest/15 py-20 md:py-28" id="events-section">
+    <div class="container-editorial">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+        <div>
+          <span class="text-[10px] tracking-[0.3em] uppercase text-gold font-semibold block mb-2">
+            EVENT CALENDAR & HIGHLIGHTS
+          </span>
+          <h2 class="editorial-title text-4xl sm:text-6xl text-forest max-w-2xl">
+            Tradeshows, Festivals & Cultural Events
+          </h2>
+          <p class="text-stone-600 max-w-xl text-xs sm:text-sm mt-3 leading-relaxed">
+            Follow our presence at leading international B2B travel table tops, or plan your journey around Bali's celebrated cultural pageants and sporting milestones.
+          </p>
+        </div>
+        <div>
+          <a
+            href="/contact/"
+            class="inline-block border-b border-forest/40 pb-1.5 text-xs tracking-widest text-forest hover:text-gold transition-colors"
+          >
+            MEET US AT AN EVENT ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Interactive Filter Tabs -->
+     <div class="flex flex-wrap gap-2 mb-8 border-b border-forest/10 pb-4" id="event-filters">
+  <button type="button" data-filter="all" class="btn-event-filter inline-flex items-center gap-1.5 border border-forest/30 bg-forest px-3.5 py-3 !text-[10px] uppercase tracking-[0.15em] text-white transition-colors duration-300 hover:border-forest hover:bg-forest/90">
+    ALL EVENTS
+  </button>
+  <button type="button" data-filter="current" class="btn-event-filter inline-flex items-center gap-1.5 border border-forest/30 px-3.5 py-3 !text-[10px] uppercase tracking-[0.15em] text-forest transition-colors duration-300 hover:border-forest hover:bg-forest/10">
+    ● CURRENT
+  </button>
+  <button type="button" data-filter="upcoming" class="btn-event-filter inline-flex items-center gap-1.5 border border-forest/30 px-3.5 py-3 !text-[10px] uppercase tracking-[0.15em] text-forest transition-colors duration-300 hover:border-forest hover:bg-forest/10">
+    UPCOMING
+  </button>
+  <button type="button" data-filter="past" class="btn-event-filter inline-flex items-center gap-1.5 border border-forest/30 px-3.5 py-3 !text-[10px] uppercase tracking-[0.15em] text-forest transition-colors duration-300 hover:border-forest hover:bg-forest/10">
+    PAST ARCHIVE
+  </button>
+</div>
+
+      <!-- 3 Event Cards (Past, Current, Upcoming) -->
+      <div class="grid gap-8 md:grid-cols-3 home-events-grid">
+        {featuredEvents.map((evt) => {
+          let badgeClass = "bg-amber-100 text-amber-900 border-amber-300";
+          let badgeText = "UPCOMING EVENT";
+          if (evt.status === "past") {
+            badgeClass = "bg-stone-200/80 text-stone-700 border-stone-300";
+            badgeText = "PAST EVENT";
+          } else if (evt.status === "current") {
+            badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300 font-bold";
+            badgeText = "● HAPPENING NOW";
+          }
+
+          return (
+            <article data-event-status={evt.status} class="event-card-item bg-white border border-forest/15 shadow-sm flex flex-col justify-between overflow-hidden group hover:border-forest/40 hover:shadow-md transition-all duration-300">
+              <div>
+                <!-- Image Container with Hover Zoom -->
+                <div class="aspect-[16/10] overflow-hidden bg-sand relative">
+                  <img
+                    src={evt.image}
+                    alt={evt.title}
+                    loading="lazy"
+                    class="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                  <!-- Status Badge -->
+                  <div class="absolute top-3 left-3">
+                    <span class={`text-[9px] tracking-widest px-2.5 py-1 uppercase border font-semibold backdrop-blur-sm ${badgeClass}`}>
+                      {evt.badge || badgeText}
+                    </span>
+                  </div>
+                  <!-- Category Tag -->
+                  <div class="absolute bottom-3 left-3">
+                    <span class="bg-forest/85 text-white text-[9px] tracking-widest px-2.5 py-1 uppercase backdrop-blur-sm">
+                      {evt.category}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="p-6">
+                  <!-- Date & Location -->
+                  <div class="flex flex-wrap items-center justify-between text-[11px] text-gold font-semibold uppercase tracking-wider mb-2">
+                    <span>🗓️ {evt.dateDisplay}</span>
+                  </div>
+
+                  <h3 class="font-display text-2xl text-forest mt-1 mb-2 leading-snug group-hover:text-gold transition-colors">
+                    {evt.title}
+                  </h3>
+
+                  <p class="text-[11px] text-stone-500 mb-3 flex items-center gap-1">
+                    <span>📍</span>
+                    <span>{evt.location}</span>
+                  </p>
+
+                  <p class="text-xs text-stone-600 leading-relaxed line-clamp-3">
+                    {evt.description}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Footer CTA with Learn More Button -->
+              <div class="px-6 pb-6 pt-3 border-t border-forest/10 flex items-center justify-between text-xs">
+                <span class="text-[10px] text-stone-400 uppercase tracking-widest">
+                  {evt.status === "current" ? "Active Program" : evt.status === "past" ? "Archived Event" : "Bookings Open"}
+                </span>
+                <button
+                  type="button"
+                  data-event-id={evt.id}
+                  class="btn-event-learn-more font-semibold text-forest hover:text-gold tracking-wider text-[11px] uppercase transition-colors inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>LEARN MORE</span>
+                  <span>↗</span>
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="container-editorial pb-24 md:pb-32">
+    <SectionHeading
+      eyebrow="CURATED STAYS"
+      title="Remarkable places. Unforgettable stays."
+      description="Discover exceptional properties selected for their character, setting, and sense of place."
+      href="/hotels/"
+    />
+    <div class="home-hotels-grid grid gap-9 md:grid-cols-2 lg:grid-cols-3">
+      {featuredHotels.map((item) => (
+        <ContentCard
+          {...item}
+          href={`/hotels/?hotel=${item.slug}`}
+          linkLabel="LEARN MORE"
+          clampDescription
+          clampLines={3}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="bg-sand py-24 md:py-32">
+    <div class="container-editorial">
+      <SectionHeading
+        eyebrow="JOURNAL & INSPIRATION"
+        title="A little inspiration for the road ahead."
+        href="/journal/"
+      />
+      <div class="home-journal-grid grid gap-10 md:grid-cols-2">
+        {featuredJournal.map((item) => (
+          <ContentCard
+            {...item}
+            href={`/journal/${item.slug}/`}
+            linkLabel="LEARN MORE"
+            clampDescription
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="container-editorial py-24 md:py-32">
+    <SectionHeading
+      eyebrow="MADE FOR YOU"
+      title="Every occasion, thoughtfully arranged."
+      description="From tailor-made holidays and intimate celebrations to corporate gatherings and group journeys, every detail is thoughtfully planned around your occasion, interests, and guests."
+      href="/plans/"
+    />
+    <div class="home-plans-grid grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
+      {featuredPlans.map((item) => (
+        <ContentCard
+          {...item}
+          href={`/plans/${item.slug}/`}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="container-editorial pb-24 md:pb-32">
+    <SectionHeading
+      eyebrow="EXCLUSIVE PRIVILEGES"
+      title="Something special awaits."
+      href="/offers/"
+    />
+    <div class="grid gap-9 md:grid-cols-2">
+      {offers.map((item) => (
+        <ContentCard
+          {...item}
+          href={`/offers/${item.slug}/`}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="image-frame-hover relative overflow-hidden bg-forest text-white">
+    <img
+      src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85"
+      alt=""
+      loading="lazy"
+      class="absolute inset-0 h-full w-full object-cover opacity-35"
+    />
+    <div class="container-editorial relative py-28 md:py-40">
+      <p class="mb-5 text-xs tracking-[0.25em]">YOUR NEXT JOURNEY</p>
+      <h2 class="editorial-title max-w-3xl text-6xl md:text-8xl home-cta-title">
+        The world is waiting.
+      </h2>
+      <a
+        href="/contact/"
+        class="hidden items-center gap-1.5 border border-white/30 px-3.5 py-3 text-[10px]
+               tracking-[0.15em] transition-colors duration-300
+               hover:border-white hover:bg-white/10 md:inline-flex"
+        title="My Profile & Saved Itineraries"
+      >
+        LET'S TALK ABOUT YOUR JOURNEY ↗
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { getSiteContent, defaultEvents } from "../utils/siteContentStorage";
+
+  const modal = document.getElementById("event-detail-modal");
+  const btnClose = document.getElementById("btn-close-event-modal");
+  const modalImg = document.getElementById("modal-event-image") as HTMLImageElement;
+  const modalBadge = document.getElementById("modal-event-badge");
+  const modalCategory = document.getElementById("modal-event-category");
+  const modalDate = document.getElementById("modal-event-date");
+  const modalTitle = document.getElementById("modal-event-title");
+  const modalLocation = document.getElementById("modal-event-location");
+  const modalDesc = document.getElementById("modal-event-description");
+  const btnPlanTrip = document.getElementById("modal-btn-plan-trip") as HTMLAnchorElement;
+  const btnWhatsapp = document.getElementById("modal-btn-whatsapp") as HTMLAnchorElement;
+  const btnExternal = document.getElementById("modal-btn-external") as HTMLAnchorElement;
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+
+  btnClose?.addEventListener("click", closeModal);
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+
+  function openEventModal(eventId: string) {
+    if (!modal) return;
+    const content = getSiteContent();
+    const allEvents = content.events && content.events.length > 0 ? content.events : defaultEvents;
+    const evt = allEvents.find((x) => x.id === eventId);
+    if (!evt) return;
+
+    if (modalImg) modalImg.src = evt.image;
+    if (modalTitle) modalTitle.textContent = evt.title;
+    if (modalCategory) modalCategory.textContent = evt.category;
+    if (modalDate) modalDate.textContent = `🗓️ ${evt.dateDisplay}`;
+    if (modalLocation) modalLocation.textContent = evt.location;
+    if (modalDesc) modalDesc.textContent = evt.description;
+
+    if (modalBadge) {
+      modalBadge.textContent = evt.badge || (evt.status === "past" ? "PAST EVENT" : evt.status === "current" ? "HAPPENING NOW" : "UPCOMING EVENT");
+      if (evt.status === "current") {
+        modalBadge.className = "text-[9px] tracking-widest px-2.5 py-1 uppercase border font-semibold backdrop-blur-md bg-emerald-100 text-emerald-800 border-emerald-300";
+      } else if (evt.status === "past") {
+        modalBadge.className = "text-[9px] tracking-widest px-2.5 py-1 uppercase border font-semibold backdrop-blur-md bg-stone-200 text-stone-700 border-stone-300";
+      } else {
+        modalBadge.className = "text-[9px] tracking-widest px-2.5 py-1 uppercase border font-semibold backdrop-blur-md bg-amber-100 text-amber-900 border-amber-300";
+      }
+    }
+
+    // WhatsApp Inquiry link
+    const cleanWa = (content.contact?.whatsapp || "+62 812 3456 7890").replace(/[^0-9]/g, "");
+    const waMsg = encodeURIComponent(
+      `Hello Tria Uma Luxury Concierge,\n\nI would like to inquire about attending / arranging travel services for:\n*Event:* ${evt.title}\n*Date:* ${evt.dateDisplay}\n*Venue:* ${evt.location}\n\nPlease advise hotel and private chauffeur packages. Thank you.`
+    );
+    if (btnWhatsapp) {
+      btnWhatsapp.href = `https://wa.me/${cleanWa}?text=${waMsg}`;
+    }
+
+    // Plan trip link — pass event title + location as query params
+    if (btnPlanTrip) {
+      btnPlanTrip.href = `/plan-your-journey/?event=${encodeURIComponent(evt.title)}&location=${encodeURIComponent(evt.location)}`;
+    }
+
+    // External link
+    if (btnExternal) {
+      if (evt.link && evt.link.startsWith("http")) {
+        btnExternal.href = evt.link;
+        btnExternal.classList.remove("hidden");
+        btnExternal.classList.add("inline-flex");
+      } else {
+        btnExternal.classList.add("hidden");
+        btnExternal.classList.remove("inline-flex");
+      }
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+
+  // Delegated click listener on document for all .btn-event-learn-more
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest<HTMLButtonElement>(".btn-event-learn-more");
+    if (btn) {
+      e.preventDefault();
+      const eventId = btn.dataset.eventId;
+      if (eventId) {
+        openEventModal(eventId);
+      }
+    }
+  });
+
+  // ── Event Filter Buttons ──────────────────────────────────────────────
+  function applyEventFilter(filter: string) {
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>(".btn-event-filter");
+    const eventCards = document.querySelectorAll<HTMLElement>(".event-card-item");
+
+    filterBtns.forEach((btn) => {
+      const active = btn.dataset.filter === filter;
+      btn.classList.toggle("bg-forest", active);
+      btn.classList.toggle("text-white", active);
+      btn.classList.toggle("border-forest", active);
+      btn.classList.toggle("text-forest/70", !active);
+      btn.classList.toggle("border-forest/20", !active);
+    });
+
+    eventCards.forEach((card) => {
+      const show = filter === "all" || card.dataset.eventStatus === filter;
+      card.classList.toggle("hidden", !show);
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const filterButton = target.closest<HTMLButtonElement>(".btn-event-filter");
+    if (filterButton) {
+      applyEventFilter(filterButton.dataset.filter ?? "all");
+    }
+  });
+</script>

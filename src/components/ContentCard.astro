@@ -1,0 +1,61 @@
+---
+interface Props {
+  category: string;
+  title: string;
+  description: string;
+  image: string;
+  href: string;
+  meta?: string;
+  linkLabel?: string;
+  clampDescription?: boolean;
+  clampLines?: 3 | 4;
+}
+
+const { category, title, description, image, href, meta, linkLabel = "DISCOVER MORE", clampDescription = false, clampLines = 4 } = Astro.props;
+---
+
+<article class="group">
+  <a href={href} class="image-hover block overflow-hidden bg-sand">
+    <div class="aspect-[4/3] overflow-hidden">
+      <img
+        src={image}
+        alt={title}
+        loading="lazy"
+        class="h-full w-full object-cover"
+      />
+    </div>
+  </a>
+
+  <div class="pt-5">
+    <div class="flex items-center justify-between gap-4">
+      <p class="text-[10px] tracking-[0.2em] text-stone-500">
+        {category}
+      </p>
+      {meta && <p class="text-xs text-stone-500">{meta}</p>}
+    </div>
+
+    <h3 class="mt-3 font-display text-3xl leading-tight md:text-4xl">
+      <a href={href} class="transition-opacity group-hover:opacity-65">
+        {title}
+      </a>
+    </h3>
+
+    <p class:list={[
+      "mt-3 text-sm leading-7 text-stone-600",
+      { "line-clamp-3": clampDescription && clampLines === 3 },
+      { "line-clamp-4": clampDescription && clampLines === 4 },
+    ]}>{description}</p>
+
+    <a
+      href={href}
+      class:list={[
+        "mt-5 inline-flex items-center gap-2",
+        linkLabel === "LEARN MORE"
+          ? "text-[11px] font-semibold uppercase tracking-[0.15em] text-forest transition-colors hover:text-gold"
+          : "gap-3 text-[10px] tracking-[0.15em]",
+      ]}
+    >
+      {linkLabel} <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</article>

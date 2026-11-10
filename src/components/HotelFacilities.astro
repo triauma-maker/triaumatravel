@@ -1,0 +1,40 @@
+---
+interface FacilityPhoto {
+  image: string;
+  description: string;
+}
+
+interface Props {
+  facilities?: FacilityPhoto[];
+}
+
+const facilities = (Astro.props.facilities || []).filter((item) => item.image || item.description);
+---
+
+{facilities.length > 0 && (
+  <section class="container-editorial pb-20 md:pb-28" data-hotel-facilities>
+    <div class="mb-8 max-w-2xl">
+      <p class="mb-3 text-[10px] tracking-[0.25em] text-stone-500">A CLOSER LOOK</p>
+      <h2 class="editorial-title text-4xl text-forest sm:text-5xl">Spaces &amp; Amenities</h2>
+    </div>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {facilities.map((facility) => (
+        <article class="flex flex-col overflow-hidden border border-forest/10 bg-white shadow-sm">
+          {facility.image && (
+            <div class="aspect-[4/3] overflow-hidden bg-sand">
+              <img
+                src={facility.image}
+                alt={facility.description || "Hotel space and amenity"}
+                class="h-full w-full object-cover transition duration-700 hover:scale-[1.03]"
+                loading="lazy"
+              />
+            </div>
+          )}
+          {facility.description && (
+            <p class="flex-1 px-5 py-4 text-sm leading-7 text-stone-600">{facility.description}</p>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+)}

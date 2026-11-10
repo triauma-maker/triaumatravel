@@ -1,0 +1,276 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import ContentCard from "../../components/ContentCard.astro";
+import { plans, offers } from "../../data/content";
+
+const activities = [
+  {
+    category: "CULTURAL TOUR",
+    title: "Temple & Heritage Walk",
+    description: "Sacred temples, traditional ceremonies, and the living culture of Bali's spiritual heartland.",
+    image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=1200&q=85",
+    tag: "cultural",
+  },
+  {
+    category: "ADVENTURE",
+    title: "Beyond the Familiar",
+    description: "Private excursions, volcano hikes, river rafting, and extraordinary open-air adventures.",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=85",
+    tag: "adventure",
+  },
+  {
+    category: "FOOD & CULINARY",
+    title: "A Taste of Place",
+    description: "Cooking classes, local market tours, farm-to-table dinners, and Bali's vibrant food scene.",
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=85",
+    tag: "culinary",
+  },
+  {
+    category: "WELLNESS & SPA",
+    title: "Time to Reconnect",
+    description: "Restorative spa rituals, yoga retreats, waterfall meditations, and Balinese healing traditions.",
+    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=85",
+    tag: "wellness",
+  },
+  {
+    category: "WATER & OCEAN",
+    title: "Island & Ocean",
+    description: "Snorkeling at Nusa Penida, private yacht charters, sunset cruises, and crystal bay dives.",
+    image: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=85",
+    tag: "water",
+  },
+  {
+    category: "NIGHTLIFE & EVENTS",
+    title: "Bali After Dark",
+    description: "Kecak fire dance at Uluwatu, rooftop bars, sunset cliff clubs, and curated evening programs.",
+    image: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=85",
+    tag: "nightlife",
+  },
+];
+---
+
+<BaseLayout
+  title="Experiences | Tria Uma"
+  description="Discover curated Bali experiences — cultural tours, adventure activities, culinary journeys, wellness retreats, signature itineraries, and exclusive offers."
+>
+  <Hero
+    compact
+    eyebrow="EXPERIENCES"
+    title="Travel deeper. Feel more."
+    subtitle="Curated activities, tours, and journeys that make every day in Bali extraordinary."
+    image="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=85"
+  />
+
+  <!-- Activity Category Filter -->
+  <section class="bg-white border-b border-forest/10 sticky top-[73px] z-40">
+    <div class="container-editorial">
+      <div id="exp-tabs" class="flex gap-0 overflow-x-auto scrollbar-none">
+        {[
+          { key: "all",       label: "All Experiences" },
+          { key: "cultural",  label: "Cultural" },
+          { key: "adventure", label: "Adventure" },
+          { key: "culinary",  label: "Food & Culinary" },
+          { key: "wellness",  label: "Wellness" },
+          { key: "water",     label: "Water & Ocean" },
+          { key: "nightlife", label: "Nightlife" },
+        ].map((tab) => (
+          <button
+            data-tab={tab.key}
+            class:list={[
+              "exp-tab-btn whitespace-nowrap px-5 py-4 text-[10px] tracking-widest uppercase transition-colors border-b-2 font-medium",
+              tab.key === "all"
+                ? "border-forest text-forest"
+                : "border-transparent text-stone-400 hover:text-forest",
+            ]}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Activity Cards -->
+  <section class="container-editorial py-16 md:py-20">
+    <SectionHeading
+      eyebrow="WHAT YOU CAN DO"
+      title="Discover your passions."
+      description="Every activity can be added to your custom itinerary — select any card to start planning."
+    />
+    <div class="grid gap-9 md:grid-cols-2 lg:grid-cols-3">
+      {activities.map((item) => (
+        <article data-exp-tag={item.tag} class="exp-card group">
+          <div class="bg-white border border-forest/15 shadow-sm overflow-hidden hover:border-forest/40 transition-all h-full flex flex-col">
+            <div class="aspect-[16/10] overflow-hidden relative">
+              <img
+                src={item.image}
+                alt={item.title}
+                class="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+            </div>
+            <div class="p-6 flex flex-col flex-1">
+              <span class="text-[10px] tracking-widest text-gold uppercase font-medium">{item.category}</span>
+              <h3 class="font-display text-2xl text-forest mt-1 mb-2 leading-snug group-hover:text-gold transition-colors">
+                {item.title}
+              </h3>
+              <p class="text-xs text-stone-600 leading-relaxed flex-1">{item.description}</p>
+              <div class="mt-5 pt-4 border-t border-forest/10">
+                <a
+                  href={`/plan-your-journey/?activity=${encodeURIComponent(item.title)}`}
+                  class="font-semibold text-forest hover:text-gold tracking-wider text-[11px] uppercase transition-colors inline-flex items-center gap-1"
+                >
+                  <span>ADD TO MY ITINERARY</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="border-t border-forest/10"></div>
+
+  <!-- Signature Plans -->
+  <section class="container-editorial py-16 md:py-20">
+    <SectionHeading
+      eyebrow="SIGNATURE JOURNEYS"
+      title="Pre-designed itineraries."
+      description="Multi-day routes crafted by our travel designers — use as inspiration or as a starting point for your custom trip."
+    />
+    <div class="grid gap-9 md:grid-cols-2">
+      {plans.map((item) => (
+        <ContentCard {...item} href="/plan-your-journey/" />
+      ))}
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="border-t border-forest/10"></div>
+
+  <!-- Special Offers -->
+  <section class="container-editorial py-16 md:py-20">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+      <SectionHeading
+        eyebrow="SPECIAL OFFERS"
+        title="Limited-time privileges."
+        description="Exclusive seasonal inclusions, upgrade benefits, and curated bonuses — available for a limited time."
+      />
+      <span class="text-[10px] tracking-widest text-stone-400 uppercase shrink-0 pb-1">Subject to availability</span>
+    </div>
+    <div class="grid gap-9 md:grid-cols-2 lg:grid-cols-3">
+      {offers.map((item) => (
+        <ContentCard {...item} href="/plan-your-journey/" />
+      ))}
+
+      <!-- Extra offer cards -->
+      <article class="bg-white border border-forest/15 shadow-sm overflow-hidden group hover:border-forest/40 transition-all flex flex-col">
+        <div class="aspect-[16/10] overflow-hidden relative">
+          <img
+            src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=80"
+            alt="Ubud & Clifftop Double Sanctuary"
+            class="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+          <div class="absolute top-3 left-3">
+            <span class="bg-forest/90 text-gold border border-gold/30 text-[9px] tracking-widest px-2.5 py-1 uppercase font-semibold">
+              EXCLUSIVE COMBO
+            </span>
+          </div>
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <span class="text-[10px] tracking-widest text-gold uppercase font-medium">UBUD & ULUWATU DUAL STAY</span>
+          <h3 class="font-display text-2xl text-forest mt-1 mb-2 leading-snug group-hover:text-gold transition-colors">
+            Highland Forest & Ocean Cliff Sanctuary
+          </h3>
+          <p class="text-xs text-stone-600 leading-relaxed flex-1">
+            3 nights Ubud river pool villa + 3 nights Uluwatu cliffside residence. Includes private Alphard transfer and daily champagne breakfast.
+          </p>
+          <div class="mt-5 pt-4 border-t border-forest/10 flex items-center justify-between text-xs">
+            <span class="text-[10px] text-stone-400 uppercase tracking-widest">On Request</span>
+            <a href="/plan-your-journey/" class="font-semibold text-forest hover:text-gold tracking-wider text-[11px] uppercase transition-colors inline-flex items-center gap-1">
+              PLAN THIS TRIP ↗
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <article class="bg-white border border-forest/15 shadow-sm overflow-hidden group hover:border-forest/40 transition-all flex flex-col">
+        <div class="aspect-[16/10] overflow-hidden relative">
+          <img
+            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+            alt="Private Yacht Nusa Penida"
+            class="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+          <div class="absolute top-3 left-3">
+            <span class="bg-forest/90 text-gold border border-gold/30 text-[9px] tracking-widest px-2.5 py-1 uppercase font-semibold">
+              LIMITED TIME
+            </span>
+          </div>
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <span class="text-[10px] tracking-widest text-gold uppercase font-medium">NUSA PENIDA CRUISE</span>
+          <h3 class="font-display text-2xl text-forest mt-1 mb-2 leading-snug group-hover:text-gold transition-colors">
+            Complimentary Private Yacht Charter
+          </h3>
+          <p class="text-xs text-stone-600 leading-relaxed flex-1">
+            Book a 7-day bespoke Bali itinerary and receive a complimentary half-day private catamaran to crystal bays with onboard private chef.
+          </p>
+          <div class="mt-5 pt-4 border-t border-forest/10 flex items-center justify-between text-xs">
+            <span class="text-[10px] text-stone-400 uppercase tracking-widest">Subject to Availability</span>
+            <a href="/plan-your-journey/" class="font-semibold text-forest hover:text-gold tracking-wider text-[11px] uppercase transition-colors inline-flex items-center gap-1">
+              PLAN THIS TRIP ↗
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- CTA Band -->
+  <section class="bg-forest text-white py-16 text-center">
+    <div class="container-editorial max-w-2xl">
+      <span class="text-[10px] tracking-[0.3em] uppercase text-gold font-medium block mb-3">YOUR TRIP, YOUR WAY</span>
+      <h3 class="editorial-title text-3xl md:text-5xl">Ready to build your own journey?</h3>
+      <p class="text-xs text-white/70 mt-3 leading-relaxed">
+        Select activities, hotels, vehicles, and services day by day — then generate a PDF proposal and submit to our reservation team.
+      </p>
+      <a
+        href="/plan-your-journey/"
+        class="mt-7 inline-block bg-gold text-forest px-8 py-4 text-xs tracking-widest uppercase font-semibold hover:bg-gold/90 transition-colors"
+      >
+        START CUSTOM ITINERARY BUILDER ↗
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>(".exp-tab-btn");
+  const cards = document.querySelectorAll<HTMLElement>(".exp-card");
+
+  function setTab(key: string) {
+    tabs.forEach((btn) => {
+      const active = btn.dataset.tab === key;
+      btn.classList.toggle("border-forest", active);
+      btn.classList.toggle("text-forest", active);
+      btn.classList.toggle("border-transparent", !active);
+      btn.classList.toggle("text-stone-400", !active);
+    });
+    cards.forEach((card) => {
+      const tag = card.dataset.expTag ?? "";
+      card.classList.toggle("hidden", key !== "all" && tag !== key);
+    });
+  }
+
+  tabs.forEach((btn) =>
+    btn.addEventListener("click", () => setTab(btn.dataset.tab ?? "all"))
+  );
+</script>

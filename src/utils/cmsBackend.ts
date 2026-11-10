@@ -32,9 +32,9 @@ export function getSupabaseClient(): SupabaseClient {
 
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   if (!isSupabaseConfigured()) return null;
-  const { data, error } = await getSupabaseClient().auth.getUser();
-  if (error) throw new Error(`Could not verify account session: ${error.message}`);
-  const user = data.user;
+  const { data, error } = await getSupabaseClient().auth.getSession();
+  if (error) throw new Error(`Could not read account session: ${error.message}`);
+  const user = data.session?.user;
   return user?.email ? { id: user.id, email: user.email } : null;
 }
 

@@ -18,7 +18,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             My Profile & Saved Journeys
           </h1>
           <p class="text-white/70 max-w-xl text-xs sm:text-sm mt-3 leading-relaxed">
-            Sign in to securely access your profile and saved journeys from any device.
+            Your profile and saved journeys are stored in this browser, so you can plan without signing in.
           </p>
         </div>
         <div>
@@ -36,33 +36,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   <!-- Profile & Itineraries Body -->
   <section class="container-editorial py-12 md:py-16">
-    <div id="guest-auth-panel" class="mx-auto max-w-lg border border-forest/15 bg-white p-6 shadow-sm md:p-8">
-      <p class="text-[9px] font-semibold uppercase tracking-widest text-gold">GUEST ACCOUNT</p>
-      <h2 class="mt-1 font-display text-3xl text-forest">Sign in to your journeys</h2>
-      <p class="mt-2 text-sm leading-6 text-stone-600">Create an account or sign in to save your profile and itineraries securely across devices.</p>
-      <form id="guest-auth-form" class="mt-6 space-y-4">
-        <label class="block text-[11px] font-medium uppercase tracking-wider text-forest">
-          Email address
-          <input id="guest-auth-email" type="email" autocomplete="email" required class="mt-1 w-full border border-forest/20 bg-ivory p-3 text-sm" />
-        </label>
-        <label class="block text-[11px] font-medium uppercase tracking-wider text-forest">
-          Password
-          <input id="guest-auth-password" type="password" autocomplete="current-password" minlength="8" required class="mt-1 w-full border border-forest/20 bg-ivory p-3 text-sm" />
-          <span class="mt-1 block normal-case tracking-normal text-stone-500">Use at least 8 characters.</span>
-        </label>
-        <div class="flex flex-wrap gap-3">
-          <button id="guest-auth-submit" type="submit" class="bg-forest px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white">Sign In</button>
-          <button id="guest-auth-toggle" type="button" class="border border-forest/25 px-5 py-3 text-xs font-semibold uppercase tracking-widest text-forest">Create Account</button>
-        </div>
-        <p id="guest-auth-status" class="hidden text-sm leading-6 text-forest" role="status" aria-live="polite"></p>
-      </form>
-    </div>
-
-    <div id="guest-data-panel" class="hidden">
-    <div class="mb-6 flex items-center justify-between border border-forest/15 bg-white p-4">
-      <p id="guest-account-email" class="text-sm text-stone-600"></p>
-      <button id="guest-auth-signout" type="button" class="border border-forest/25 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-forest">Sign Out</button>
-    </div>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
       <!-- LEFT: Profile Information (4 cols) -->
@@ -163,10 +136,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <div class="lg:col-span-8 space-y-6">
         <div class="flex items-center justify-between border-b border-forest/15 pb-4">
           <div>
-            <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">YOUR ACCOUNT</span>
+            <span class="text-[9px] tracking-widest text-gold font-semibold uppercase">THIS BROWSER</span>
             <h2 class="font-display text-2xl md:text-3xl text-forest mt-0.5">Saved Itineraries (<span id="count-itineraries">0</span>)</h2>
           </div>
-          <span class="text-xs text-stone-500 font-mono">Synced with your account</span>
+          <span class="text-xs text-stone-500 font-mono">Saved on this device</span>
         </div>
 
         <!-- Itineraries List Container -->
@@ -192,7 +165,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         </div>
       </div>
 
-    </div>
     </div>
   </section>
 
@@ -230,10 +202,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     loadAdminElements,
     saveUserItinerary,
     generateReservationReference,
-    migrateLegacyUserData,
     type CustomItineraryData,
   } from "../../utils/itineraryStorage";
-  import { getAuthenticatedUser, signInCustomer, signOutCustomer, signUpCustomer } from "../../utils/cmsBackend";
 
   let adminElements = getAdminElements();
   try {
@@ -252,16 +222,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   const emptyItineraries = document.getElementById("empty-itineraries")!;
   const countItineraries = document.getElementById("count-itineraries")!;
   const toast = document.getElementById("profile-toast")!;
-  const authPanel = document.getElementById("guest-auth-panel")!;
-  const dataPanel = document.getElementById("guest-data-panel")!;
-  const authForm = document.getElementById("guest-auth-form") as HTMLFormElement;
-  const authEmail = document.getElementById("guest-auth-email") as HTMLInputElement;
-  const authPassword = document.getElementById("guest-auth-password") as HTMLInputElement;
-  const authSubmit = document.getElementById("guest-auth-submit") as HTMLButtonElement;
-  const authToggle = document.getElementById("guest-auth-toggle") as HTMLButtonElement;
-  const authStatus = document.getElementById("guest-auth-status")!;
-  const accountEmail = document.getElementById("guest-account-email")!;
-  let authMode: "sign-in" | "sign-up" = "sign-in";
 
   function showToast(msg: string) {
     if (!toast) return;
@@ -272,88 +232,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     }, 2800);
   }
 
-  function showAuthStatus(message: string, isError = false) {
-    authStatus.textContent = message;
-    authStatus.classList.remove("hidden", "text-red-700", "text-forest");
-    authStatus.classList.add(isError ? "text-red-700" : "text-forest");
-  }
-
-  async function loadAccountData(userId: string, email: string) {
-    await migrateLegacyUserData(userId);
-    const [existingProfile, list] = await Promise.all([
-      getUserProfile(userId),
-      getUserItineraries(userId),
-    ]);
-    profileName.value = existingProfile.name || "";
-    profileEmail.value = existingProfile.email || email;
-    profilePhone.value = existingProfile.phone || "";
-    profileCountry.value = existingProfile.country || "";
-    profileNotes.value = existingProfile.notes || "";
-    accountEmail.textContent = `Signed in as ${email}`;
-    authPanel.classList.add("hidden");
-    dataPanel.classList.remove("hidden");
-    renderItineraries(list);
-  }
-
-  authToggle.addEventListener("click", () => {
-    authMode = authMode === "sign-in" ? "sign-up" : "sign-in";
-    authSubmit.textContent = authMode === "sign-in" ? "Sign In" : "Create Account";
-    authToggle.textContent = authMode === "sign-in" ? "Create Account" : "I Already Have an Account";
-    authPassword.autocomplete = authMode === "sign-in" ? "current-password" : "new-password";
-    authStatus.classList.add("hidden");
-  });
-
-  authForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    authStatus.classList.add("hidden");
-    authSubmit.disabled = true;
-    try {
-      if (authMode === "sign-up") {
-        const signedIn = await signUpCustomer(authEmail.value, authPassword.value);
-        if (!signedIn) {
-          showAuthStatus("Account created. Check your email to confirm the account, then sign in here.");
-          return;
-        }
-      } else {
-        await signInCustomer(authEmail.value, authPassword.value);
-      }
-
-      const user = await getAuthenticatedUser();
-      if (!user) throw new Error("Account sign-in completed, but no authenticated session was returned.");
-      await loadAccountData(user.id, user.email);
-      showToast("Signed in successfully.");
-      const returnTo = new URLSearchParams(window.location.search).get("returnTo");
-      if (returnTo?.startsWith("/") && !returnTo.startsWith("//")) {
-        window.location.assign(returnTo);
-        return;
-      }
-    } catch (error) {
-      console.error("Could not sign in to guest account:", error);
-      showAuthStatus(error instanceof Error ? error.message : "Could not sign in. Please try again.", true);
-    } finally {
-      authSubmit.disabled = false;
-    }
-  });
-
-  document.getElementById("guest-auth-signout")?.addEventListener("click", async () => {
-    try {
-      await signOutCustomer();
-      dataPanel.classList.add("hidden");
-      authPanel.classList.remove("hidden");
-      authPassword.value = "";
-      showToast("Signed out.");
-    } catch (error) {
-      console.error("Could not sign out guest account:", error);
-      showToast(error instanceof Error ? error.message : "Could not sign out.");
-    }
-  });
-
   try {
-    const user = await getAuthenticatedUser();
-    if (user) await loadAccountData(user.id, user.email);
+    const [profile, itineraries] = await Promise.all([getUserProfile(), getUserItineraries()]);
+    profileName.value = profile.name || "";
+    profileEmail.value = profile.email || "";
+    profilePhone.value = profile.phone || "";
+    profileCountry.value = profile.country || "";
+    profileNotes.value = profile.notes || "";
+    renderItineraries(itineraries);
   } catch (error) {
-    console.error("Could not load guest account:", error);
-    showAuthStatus(error instanceof Error ? error.message : "Could not connect to your account.", true);
+    console.error("Could not load browser-saved guest data:", error);
+    showToast(error instanceof Error ? error.message : "Could not load saved data from this browser.");
   }
 
   profileForm.addEventListener("submit", async (e) => {
@@ -366,7 +255,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         country: profileCountry.value.trim(),
         notes: profileNotes.value.trim(),
       });
-      showToast("Profile details saved to your account.");
+      showToast("Profile details saved in this browser.");
     } catch (error) {
       console.error("Could not save guest profile:", error);
       showToast(error instanceof Error ? error.message : "Could not save profile.");
@@ -520,7 +409,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     // Attach Event Handlers
     itinerariesList.querySelectorAll<HTMLButtonElement>(".btn-delete").forEach((btn) => {
       btn.addEventListener("click", async () => {
-        if (!confirm("Are you sure you want to delete this saved itinerary from your account?")) return;
+        if (!confirm("Are you sure you want to delete this saved itinerary from this browser?")) return;
         try {
           await deleteUserItinerary(btn.dataset.id!);
           renderItineraries(await getUserItineraries());

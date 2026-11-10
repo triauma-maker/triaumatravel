@@ -556,10 +556,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     generateReservationReference,
     getContactSettings,
     loadContactSettings,
-    migrateLegacyUserData,
     type CustomItineraryData,
   } from "../../utils/itineraryStorage";
-  import { getAuthenticatedUser } from "../../utils/cmsBackend";
 
   // Elements store
   let adminElements = getAdminElements();
@@ -574,24 +572,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   }
   const urlParams = new URLSearchParams(window.location.search);
   const editId = urlParams.get("id");
-  let customerUser: Awaited<ReturnType<typeof getAuthenticatedUser>> = null;
   let userProfile = { name: "", email: "", phone: "" };
   let loadedItinerary: CustomItineraryData | undefined;
-  let accountLoadError: unknown;
+  let browserDataError: unknown;
   try {
-    customerUser = await getAuthenticatedUser();
-    if (customerUser) {
-      await migrateLegacyUserData(customerUser.id);
-      userProfile = await getUserProfile(customerUser.id);
-      userProfile.email ||= customerUser.email;
-      if (editId) loadedItinerary = await getUserItineraryById(editId, customerUser.id);
-    } else if (editId) {
-      const returnTo = `${window.location.pathname}${window.location.search}`;
-      window.location.assign(`/profile/?returnTo=${encodeURIComponent(returnTo)}`);
-    }
+    userProfile = await getUserProfile();
+    if (editId) loadedItinerary = await getUserItineraryById(editId);
   } catch (error) {
-    accountLoadError = error;
-    console.error("Could not load customer itinerary data:", error);
+    browserDataError = error;
+    console.error("Could not load browser itinerary data:", error);
   }
 
   // Planner State
@@ -701,8 +690,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     }, 2800);
   }
 
-  if (accountLoadError) {
-    showToast(accountLoadError instanceof Error ? accountLoadError.message : "Could not load your account data.");
+  if (browserDataError) {
+    showToast(browserDataError instanceof Error ? browserDataError.message : "Could not load your saved browser data.");
   }
 
   // Populate guest info if available
@@ -1139,14 +1128,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   btnSaveProfile.addEventListener("click", async () => {
     const previousStatus = itineraryStatus;
     try {
-      const user = await getAuthenticatedUser();
-      if (!user) {
-        const returnTo = `${window.location.pathname}${window.location.search}`;
-        window.location.assign(`/profile/?returnTo=${encodeURIComponent(returnTo)}`);
-        showToast("Sign in to save your itinerary.");
-        return;
-      }
-
       saveCurrentDayForm();
       if (itineraryStatus === "draft") {
         itineraryStatus = "saved";
@@ -1191,14 +1172,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const previousStatus = itineraryStatus;
     const previousReference = referenceCode;
     try {
-      const user = await getAuthenticatedUser();
-      if (!user) {
-        const returnTo = `${window.location.pathname}${window.location.search}`;
-        window.location.assign(`/profile/?returnTo=${encodeURIComponent(returnTo)}`);
-        showToast("Sign in to submit your itinerary.");
-        return;
-      }
-
       if (!referenceCode) {
         referenceCode = generateReservationReference();
       }

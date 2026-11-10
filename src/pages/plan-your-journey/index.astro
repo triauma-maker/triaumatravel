@@ -94,8 +94,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   id="input-guest-name"
                   class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:bg-white focus:outline-none focus:border-forest"
                   placeholder="e.g. Alexandra Sterling"
+                  aria-describedby="error-guest-name"
                   required
                 />
+                <p id="error-guest-name" class="mt-1.5 text-xs text-red-700 hidden" aria-live="polite"></p>
               </div>
               <div>
                 <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
@@ -106,8 +108,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   id="input-guest-email"
                   class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:bg-white focus:outline-none focus:border-forest"
                   placeholder="name@example.com"
+                  aria-describedby="error-guest-email"
                   required
                 />
+                <p id="error-guest-email" class="mt-1.5 text-xs text-red-700 hidden" aria-live="polite"></p>
               </div>
               <div>
                 <label class="block text-xs uppercase tracking-widest text-forest font-medium mb-1.5">
@@ -118,8 +122,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   id="input-guest-phone"
                   class="w-full border border-forest/20 p-3 text-xs bg-ivory focus:bg-white focus:outline-none focus:border-forest"
                   placeholder="+62 812 3456 7890"
+                  aria-describedby="error-guest-phone"
                   required
                 />
+                <p id="error-guest-phone" class="mt-1.5 text-xs text-red-700 hidden" aria-live="polite"></p>
               </div>
             </div>
 
@@ -728,6 +734,41 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   const inputGuestName = document.getElementById("input-guest-name") as HTMLInputElement;
   const inputGuestEmail = document.getElementById("input-guest-email") as HTMLInputElement;
   const inputGuestPhone = document.getElementById("input-guest-phone") as HTMLInputElement;
+  const guestValidationFields = [
+    {
+      input: inputGuestName,
+      error: document.getElementById("error-guest-name")!,
+      message: () => inputGuestName.value.trim() ? "" : "Please enter the lead guest name.",
+    },
+    {
+      input: inputGuestEmail,
+      error: document.getElementById("error-guest-email")!,
+      message: () => {
+        if (!inputGuestEmail.value.trim()) return "Please enter an email address.";
+        return inputGuestEmail.validity.typeMismatch ? "Please enter a valid email address." : "";
+      },
+    },
+    {
+      input: inputGuestPhone,
+      error: document.getElementById("error-guest-phone")!,
+      message: () => inputGuestPhone.value.trim() ? "" : "Please enter a phone or WhatsApp number.",
+    },
+  ];
+  let guestValidationAttempted = false;
+  function updateGuestFieldValidation(field: (typeof guestValidationFields)[number]) {
+    const message = field.message();
+    field.error.textContent = message;
+    field.error.classList.toggle("hidden", !message);
+    field.input.setAttribute("aria-invalid", message ? "true" : "false");
+    field.input.classList.toggle("border-red-600", Boolean(message));
+  }
+  guestValidationFields.forEach((field) => {
+    field.input.addEventListener("input", () => {
+      if (guestValidationAttempted || field.input.getAttribute("aria-invalid") === "true") {
+        updateGuestFieldValidation(field);
+      }
+    });
+  });
   const inputDuration = document.getElementById("input-duration") as HTMLInputElement;
   const displayNights = document.getElementById("display-nights") as HTMLInputElement;
   const inputStartDate = document.getElementById("input-start-date") as HTMLInputElement;
@@ -1270,13 +1311,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   btnSubmitReservation.addEventListener("click", async () => {
     saveCurrentDayForm();
 
-    const guestName = inputGuestName.value.trim();
-    const guestEmail = inputGuestEmail.value.trim();
-    const guestPhone = inputGuestPhone.value.trim();
-
-    if (!guestName || !guestEmail || !guestPhone) {
-      alert("Please enter Lead Guest Name, Email, and Phone / WhatsApp before submitting to reservation.");
-      inputGuestName.focus();
+    guestValidationAttempted = true;
+    guestValidationFields.forEach(updateGuestFieldValidation);
+    const firstInvalidField = guestValidationFields.find((field) => field.message());
+    if (firstInvalidField) {
+      firstInvalidField.input.focus({ preventScroll: true });
+      firstInvalidField.input.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 

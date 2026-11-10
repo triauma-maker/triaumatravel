@@ -1,4 +1,4 @@
-import { getSiteContent } from "../utils/siteContentStorage";
+import { loadSiteContent } from "../utils/siteContentStorage";
 import { parseOptimizedVideo } from "../utils/videoOptimizer";
 
 function escapeHtml(value: unknown): string {
@@ -36,10 +36,10 @@ function contentCard(item: any, basePath: string): string {
     </article>`;
 }
 
-export function initSiteContentHydration() {
+export async function initSiteContentHydration() {
   if (typeof window === "undefined") return;
 
-  const content = getSiteContent();
+  const content = await loadSiteContent();
   const path = window.location.pathname;
 
   // 1. Hydrate Header and Brand
@@ -447,17 +447,20 @@ export function initSiteContentHydration() {
         .join("");
     }
   }
+  window.dispatchEvent(new CustomEvent("tria_uma_cms_data_loaded", { detail: content }));
 }
 
 // Run on page load
 if (typeof window !== "undefined") {
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initSiteContentHydration);
+    document.addEventListener("DOMContentLoaded", () => {
+      void initSiteContentHydration().catch((error: unknown) => console.error("Could not hydrate website content:", error));
+    });
   } else {
-    initSiteContentHydration();
+    void initSiteContentHydration().catch((error: unknown) => console.error("Could not hydrate website content:", error));
   }
 
   window.addEventListener("tria_uma_site_content_updated", () => {
-    initSiteContentHydration();
+    void initSiteContentHydration().catch((error: unknown) => console.error("Could not hydrate website content:", error));
   });
 }

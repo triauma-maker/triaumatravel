@@ -117,13 +117,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
-  import { getSiteContent } from "../utils/siteContentStorage";
+  import { loadSiteContent } from "../utils/siteContentStorage";
 
   const form = document.getElementById("contact-inquiry-form") as HTMLFormElement | null;
   const response = document.getElementById("contact-form-response");
   const emailFallback = document.getElementById("contact-email-fallback") as HTMLAnchorElement | null;
 
-  form?.addEventListener("submit", (event) => {
+  form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
 
@@ -132,7 +132,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const email = String(formData.get("email") || "").trim();
     const destination = String(formData.get("destination") || "").trim();
     const message = String(formData.get("message") || "").trim();
-    const contactEmail = getSiteContent().contact.email;
+    let content: Awaited<ReturnType<typeof loadSiteContent>>;
+    try {
+      content = await loadSiteContent();
+    } catch (error) {
+      console.error("Could not load reservation contact details:", error);
+      if (response) {
+        response.textContent = "We could not load the reservation email address. Please refresh the page or contact us using the details above.";
+        response.classList.remove("hidden");
+      }
+      return;
+    }
+    const contactEmail = content.contact.email;
     const subject = `Travel inquiry from ${name}`;
     const body = [
       "Hello Tria Uma,",

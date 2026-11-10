@@ -548,25 +548,51 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 <script>
   import {
     getAdminElements,
-    STORAGE_KEYS,
-    getUserItineraries,
+    loadAdminElements,
     getUserItineraryById,
     saveUserItinerary,
     getUserProfile,
     saveUserProfile,
     generateReservationReference,
     getContactSettings,
+    loadContactSettings,
+    migrateLegacyUserData,
     type CustomItineraryData,
   } from "../../utils/itineraryStorage";
+  import { getAuthenticatedUser } from "../../utils/cmsBackend";
 
   // Elements store
-  const adminElements = getAdminElements();
-  const userProfile = getUserProfile();
-
-  // Check URL query for existing itinerary id
+  let adminElements = getAdminElements();
+  let reservationContactSettings = getContactSettings();
+  try {
+    [adminElements, reservationContactSettings] = await Promise.all([
+      loadAdminElements(),
+      loadContactSettings(),
+    ]);
+  } catch (error) {
+    console.error("Could not load itinerary settings from Supabase:", error);
+  }
   const urlParams = new URLSearchParams(window.location.search);
   const editId = urlParams.get("id");
-  let loadedItinerary: CustomItineraryData | undefined = editId ? getUserItineraryById(editId) : undefined;
+  let customerUser: Awaited<ReturnType<typeof getAuthenticatedUser>> = null;
+  let userProfile = { name: "", email: "", phone: "" };
+  let loadedItinerary: CustomItineraryData | undefined;
+  let accountLoadError: unknown;
+  try {
+    customerUser = await getAuthenticatedUser();
+    if (customerUser) {
+      await migrateLegacyUserData(customerUser.id);
+      userProfile = await getUserProfile(customerUser.id);
+      userProfile.email ||= customerUser.email;
+      if (editId) loadedItinerary = await getUserItineraryById(editId, customerUser.id);
+    } else if (editId) {
+      const returnTo = `${window.location.pathname}${window.location.search}`;
+      window.location.assign(`/profile/?returnTo=${encodeURIComponent(returnTo)}`);
+    }
+  } catch (error) {
+    accountLoadError = error;
+    console.error("Could not load customer itinerary data:", error);
+  }
 
   // Planner State
   let currentItineraryId = loadedItinerary?.id || `itinerary-${Date.now()}`;
@@ -673,6 +699,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     setTimeout(() => {
       plannerToast.classList.add("translate-y-20", "opacity-0");
     }, 2800);
+  }
+
+  if (accountLoadError) {
+    showToast(accountLoadError instanceof Error ? accountLoadError.message : "Could not load your account data.");
   }
 
   // Populate guest info if available
@@ -880,17 +910,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     });
   }
 
-  function refreshActivitiesFromStorage() {
+  async function refreshActivitiesFromStorage() {
     saveCurrentDayForm();
-    adminElements.activities = getAdminElements().activities;
+    try {
+      adminElements = await loadAdminElements();
+    } catch (error) {
+      console.error("Could not refresh itinerary elements:", error);
+      return;
+    }
     loadActiveDayForm();
     updateSummary();
   }
 
-  window.addEventListener("tria_uma_elements_updated", refreshActivitiesFromStorage);
+  window.addEventListener("tria_uma_elements_updated", () => {
+    void refreshActivitiesFromStorage();
+  });
   window.addEventListener("storage", (event) => {
     if (event.key === STORAGE_KEYS.ADMIN_ELEMENTS || event.key === null) {
-      refreshActivitiesFromStorage();
+      void refreshActivitiesFromStorage();
     }
   });
 
@@ -1099,29 +1136,46 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   }
 
   // Save to Profile Handler
-  btnSaveProfile.addEventListener("click", () => {
-    saveCurrentDayForm();
-    if (itineraryStatus === "draft") {
-      itineraryStatus = "saved";
-    }
-    const data = compileItineraryData();
-    saveUserItinerary(data);
+  btnSaveProfile.addEventListener("click", async () => {
+    const previousStatus = itineraryStatus;
+    try {
+      const user = await getAuthenticatedUser();
+      if (!user) {
+        const returnTo = `${window.location.pathname}${window.location.search}`;
+        window.location.assign(`/profile/?returnTo=${encodeURIComponent(returnTo)}`);
+        showToast("Sign in to save your itinerary.");
+        return;
+      }
 
-    // Save profile contact info for convenience
-    if (data.guest.name || data.guest.email) {
-      saveUserProfile({
-        name: data.guest.name,
-        email: data.guest.email,
-        phone: data.guest.phone,
-      });
-    }
+      saveCurrentDayForm();
+      if (itineraryStatus === "draft") {
+        itineraryStatus = "saved";
+      }
+      const data = compileItineraryData();
+      await saveUserItinerary(data);
 
-    updateSummary();
-    showToast("Itinerary saved to your Profile!");
+      if (data.guest.name || data.guest.email) {
+        userProfile = {
+          ...userProfile,
+          name: data.guest.name,
+          email: data.guest.email,
+          phone: data.guest.phone,
+        };
+        await saveUserProfile(userProfile);
+      }
+
+      updateSummary();
+      showToast("Itinerary saved to your Profile!");
+    } catch (error) {
+      itineraryStatus = previousStatus;
+      updateSummary();
+      console.error("Could not save itinerary:", error);
+      showToast(error instanceof Error ? error.message : "Could not save your itinerary.");
+    }
   });
 
   // Submit to Reservation Handler
-  btnSubmitReservation.addEventListener("click", () => {
+  btnSubmitReservation.addEventListener("click", async () => {
     saveCurrentDayForm();
 
     const guestName = inputGuestName.value.trim();
@@ -1134,91 +1188,107 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       return;
     }
 
-    if (!referenceCode) {
-      referenceCode = generateReservationReference();
+    const previousStatus = itineraryStatus;
+    const previousReference = referenceCode;
+    try {
+      const user = await getAuthenticatedUser();
+      if (!user) {
+        const returnTo = `${window.location.pathname}${window.location.search}`;
+        window.location.assign(`/profile/?returnTo=${encodeURIComponent(returnTo)}`);
+        showToast("Sign in to submit your itinerary.");
+        return;
+      }
+
+      if (!referenceCode) {
+        referenceCode = generateReservationReference();
+      }
+      itineraryStatus = "submitted";
+
+      const data = compileItineraryData();
+      await saveUserItinerary(data);
+      updateSummary();
+
+      modalRefCode.textContent = referenceCode;
+      modalGuestName.textContent = data.guest.name;
+      modalDuration.textContent = `${data.durationDays} Days / ${data.durationNights} Nights`;
+
+      const veh = adminElements.vehicles.find((v) => v.id === selectedVehicleId);
+      const contact = reservationContactSettings;
+      const formatDate = (date: string | undefined) => date
+        ? new Date(`${date}T00:00:00`).toLocaleDateString("en-GB")
+        : "Not specified";
+      const itineraryDays = data.days.map((day) => {
+        const hotel = adminElements.hotels.find((item) => item.id === day.hotelId);
+        const service = adminElements.services.find((item) => item.id === day.serviceId);
+        const activities = adminElements.activities
+          .filter((item) => (day.activityIds || []).includes(item.id))
+          .map((item) => item.title);
+        return [
+          `Day ${day.dayNumber}: ${day.title}`,
+          hotel ? `Hotel: ${hotel.name} (${hotel.location})` : "",
+          service ? `Service: ${service.name}` : "",
+          activities.length ? `Experiences: ${activities.join(", ")}` : "",
+          day.notes ? `Notes: ${day.notes}` : "",
+        ].filter(Boolean).join("\n");
+      }).join("\n\n");
+      const selectedServiceNames = adminElements.services
+        .filter((service) => data.selectedServices.includes(service.id))
+        .map((service) => service.name);
+      const travellerSummary = `${data.travellers.adults} Adults${data.travellers.children ? `, ${data.travellers.children} Children` : ""}`;
+      const whatsappMessage = [
+        `Hello ${contact.companyName} Reservation Team,`,
+        "",
+        "*QUOTATION REQUEST*",
+        `*Reference:* ${referenceCode}`,
+        `*Itinerary:* _${data.title}_`,
+        `*Lead guest:* ${data.guest.name}`,
+        `*Email:* ${data.guest.email}`,
+        `*Phone / WhatsApp:* ${data.guest.phone}`,
+        `*Travel dates:* ${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
+        `*Duration:* ${data.durationDays} Days / ${data.durationNights} Nights`,
+        `*Travellers:* ${travellerSummary}`,
+        `*Vehicle:* ${veh?.name || "None selected"}`,
+        `*Selected services:* ${selectedServiceNames.join(", ") || "None selected"}`,
+        "",
+        "*DAY-TO-DAY ITINERARY*",
+        itineraryDays,
+        "",
+        "_Please advise availability and prepare a formal quotation. Thank you._",
+      ].join("\n");
+      const emailMessage = [
+        `HELLO ${contact.companyName.toUpperCase()} RESERVATION TEAM,`,
+        "",
+        "QUOTATION REQUEST",
+        "=================",
+        `REFERENCE: ${referenceCode}`,
+        `ITINERARY: ${data.title}`,
+        `LEAD GUEST: ${data.guest.name}`,
+        `EMAIL: ${data.guest.email}`,
+        `PHONE / WHATSAPP: ${data.guest.phone}`,
+        `TRAVEL DATES: ${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
+        `DURATION: ${data.durationDays} Days / ${data.durationNights} Nights`,
+        `TRAVELLERS: ${travellerSummary}`,
+        `VEHICLE: ${veh?.name || "None selected"}`,
+        `SELECTED SERVICES: ${selectedServiceNames.join(", ") || "None selected"}`,
+        "",
+        "DAY-TO-DAY ITINERARY",
+        "--------------------",
+        itineraryDays,
+        "",
+        "Please advise availability and prepare a formal quotation. Thank you.",
+      ].join("\n");
+      btnWhatsappChat.href = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+      btnEmailReservation.href = `mailto:${encodeURIComponent(contact.reservationEmail)}?subject=${encodeURIComponent(`Reservation request ${referenceCode} - ${data.guest.name}`)}&body=${encodeURIComponent(emailMessage)}`;
+
+      submitModal.classList.remove("hidden");
+      submitModal.classList.add("flex");
+    } catch (error) {
+      itineraryStatus = previousStatus;
+      referenceCode = previousReference;
+      updateSummary();
+      console.error("Could not submit itinerary:", error);
+      showToast(error instanceof Error ? error.message : "Could not submit your itinerary.");
     }
-    itineraryStatus = "submitted";
-
-    const data = compileItineraryData();
-    saveUserItinerary(data);
-    updateSummary();
-
-    // Populate modal
-    modalRefCode.textContent = referenceCode;
-    modalGuestName.textContent = data.guest.name;
-    modalDuration.textContent = `${data.durationDays} Days / ${data.durationNights} Nights`;
-
-    // Prepare the same itinerary summary for WhatsApp and email.
-    const veh = adminElements.vehicles.find((v) => v.id === selectedVehicleId);
-    const contact = getContactSettings();
-    const formatDate = (date: string | undefined) => date
-      ? new Date(`${date}T00:00:00`).toLocaleDateString("en-GB")
-      : "Not specified";
-    const itineraryDays = data.days.map((day) => {
-      const hotel = adminElements.hotels.find((item) => item.id === day.hotelId);
-      const service = adminElements.services.find((item) => item.id === day.serviceId);
-      const activities = adminElements.activities
-        .filter((item) => (day.activityIds || []).includes(item.id))
-        .map((item) => item.title);
-      return [
-        `Day ${day.dayNumber}: ${day.title}`,
-        hotel ? `Hotel: ${hotel.name} (${hotel.location})` : "",
-        service ? `Service: ${service.name}` : "",
-        activities.length ? `Experiences: ${activities.join(", ")}` : "",
-        day.notes ? `Notes: ${day.notes}` : "",
-      ].filter(Boolean).join("\n");
-    }).join("\n\n");
-    const selectedServiceNames = adminElements.services
-      .filter((service) => data.selectedServices.includes(service.id))
-      .map((service) => service.name);
-    const travellerSummary = `${data.travellers.adults} Adults${data.travellers.children ? `, ${data.travellers.children} Children` : ""}`;
-    const whatsappMessage = [
-      `Hello ${contact.companyName} Reservation Team,`,
-      "",
-      "*QUOTATION REQUEST*",
-      `*Reference:* ${referenceCode}`,
-      `*Itinerary:* _${data.title}_`,
-      `*Lead guest:* ${data.guest.name}`,
-      `*Email:* ${data.guest.email}`,
-      `*Phone / WhatsApp:* ${data.guest.phone}`,
-      `*Travel dates:* ${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
-      `*Duration:* ${data.durationDays} Days / ${data.durationNights} Nights`,
-      `*Travellers:* ${travellerSummary}`,
-      `*Vehicle:* ${veh?.name || "None selected"}`,
-      `*Selected services:* ${selectedServiceNames.join(", ") || "None selected"}`,
-      "",
-      "*DAY-TO-DAY ITINERARY*",
-      itineraryDays,
-      "",
-      "_Please advise availability and prepare a formal quotation. Thank you._",
-    ].join("\n");
-    const emailMessage = [
-      `HELLO ${contact.companyName.toUpperCase()} RESERVATION TEAM,`,
-      "",
-      "QUOTATION REQUEST",
-      "=================",
-      `REFERENCE: ${referenceCode}`,
-      `ITINERARY: ${data.title}`,
-      `LEAD GUEST: ${data.guest.name}`,
-      `EMAIL: ${data.guest.email}`,
-      `PHONE / WHATSAPP: ${data.guest.phone}`,
-      `TRAVEL DATES: ${formatDate(data.startDate)} - ${formatDate(data.endDate)}`,
-      `DURATION: ${data.durationDays} Days / ${data.durationNights} Nights`,
-      `TRAVELLERS: ${travellerSummary}`,
-      `VEHICLE: ${veh?.name || "None selected"}`,
-      `SELECTED SERVICES: ${selectedServiceNames.join(", ") || "None selected"}`,
-      "",
-      "DAY-TO-DAY ITINERARY",
-      "--------------------",
-      itineraryDays,
-      "",
-      "Please advise availability and prepare a formal quotation. Thank you.",
-    ].join("\n");
-    btnWhatsappChat.href = `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-    btnEmailReservation.href = `mailto:${encodeURIComponent(contact.reservationEmail)}?subject=${encodeURIComponent(`Reservation request ${referenceCode} - ${data.guest.name}`)}&body=${encodeURIComponent(emailMessage)}`;
-
-    submitModal.classList.remove("hidden");
-    submitModal.classList.add("flex");
   });
 
   modalSubmitClose.addEventListener("click", () => {

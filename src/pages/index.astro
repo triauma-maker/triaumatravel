@@ -367,7 +367,7 @@ const general = defaultSiteContent.general;
 </BaseLayout>
 
 <script>
-  import { getSiteContent, defaultEvents } from "../utils/siteContentStorage";
+  import { loadSiteContent, defaultEvents } from "../utils/siteContentStorage";
 
   const modal = document.getElementById("event-detail-modal");
   const btnClose = document.getElementById("btn-close-event-modal");
@@ -396,9 +396,9 @@ const general = defaultSiteContent.general;
     if (e.key === "Escape") closeModal();
   });
 
-  function openEventModal(eventId: string) {
+  async function openEventModal(eventId: string) {
     if (!modal) return;
-    const content = getSiteContent();
+    const content = await loadSiteContent();
     const allEvents = content.events && content.events.length > 0 ? content.events : defaultEvents;
     const evt = allEvents.find((x) => x.id === eventId);
     if (!evt) return;
@@ -459,7 +459,7 @@ const general = defaultSiteContent.general;
       e.preventDefault();
       const eventId = btn.dataset.eventId;
       if (eventId) {
-        openEventModal(eventId);
+        void openEventModal(eventId).catch((error: unknown) => console.error("Could not load event details:", error));
       }
     }
   });

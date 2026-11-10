@@ -51,13 +51,13 @@ entries.sort((a, b) => a.data.title.localeCompare(b.data.title));
   </main>
 
   <script>
-    import { getSiteContent } from "../../utils/siteContentStorage";
+    import { loadSiteContent } from "../../utils/siteContentStorage";
 
     const storySlug = new URLSearchParams(window.location.search).get("story");
     if (storySlug) {
       const detail = document.getElementById("cms-journal-detail");
       const grid = document.querySelector(".cms-journal-grid");
-      const storedContent = getSiteContent();
+      const storedContent = await loadSiteContent();
       const story = storedContent.journal.find((item) => item.slug === storySlug);
       const pageHeading = document.getElementById("journal-page-heading");
       if (story && detail) {

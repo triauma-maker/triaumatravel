@@ -11,6 +11,12 @@ import {
   defaultServices,
   defaultDayTemplates,
 } from "../data/itineraryElements";
+import {
+  fetchCmsPayload,
+  getAuthenticatedUser,
+  getSupabaseClient,
+  saveCmsPayloadPatch,
+} from "./cmsBackend";
 
 export const STORAGE_KEYS = {
   ADMIN_ELEMENTS: "tria_uma_admin_itinerary_elements",
@@ -74,18 +80,31 @@ export function getAdminElements(): AdminElementsStore {
   }
 }
 
-export function saveAdminElements(data: AdminElementsStore): void {
-  if (typeof window === "undefined") return;
+export async function loadAdminElements(): Promise<AdminElementsStore> {
+  const payload = await fetchCmsPayload();
+  const parsed = payload?.itineraryElements as Partial<AdminElementsStore> | undefined;
+  if (!parsed) return getAdminElements();
+  const data = {
+    hotels: parsed.hotels?.length ? parsed.hotels : defaultHotels,
+    activities: parsed.activities?.length ? parsed.activities : defaultActivities,
+    vehicles: parsed.vehicles?.length ? parsed.vehicles : defaultVehicles,
+    services: parsed.services?.length ? parsed.services : defaultServices,
+    dayTemplates: parsed.dayTemplates?.length ? parsed.dayTemplates : defaultDayTemplates,
+  };
+  if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEYS.ADMIN_ELEMENTS, JSON.stringify(data));
+  return data;
+}
+
+export async function saveAdminElements(data: AdminElementsStore): Promise<void> {
+  if (typeof window === "undefined") throw new Error("Itinerary elements can only be saved in a browser.");
+  await saveCmsPayloadPatch({ itineraryElements: data });
   localStorage.setItem(STORAGE_KEYS.ADMIN_ELEMENTS, JSON.stringify(data));
   window.dispatchEvent(new CustomEvent("tria_uma_elements_updated", { detail: data }));
 }
 
-export function resetAdminElementsToDefault(): AdminElementsStore {
+export async function resetAdminElementsToDefault(): Promise<AdminElementsStore> {
   const defaults = getDefaultAdminElements();
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_ELEMENTS, JSON.stringify(defaults));
-    window.dispatchEvent(new CustomEvent("tria_uma_elements_updated", { detail: defaults }));
-  }
+  await saveAdminElements(defaults);
   return defaults;
 }
 
@@ -100,52 +119,115 @@ export function getContactSettings(): ReservationContactSettings {
   return defaultContactSettings;
 }
 
-export function saveContactSettings(settings: ReservationContactSettings): void {
-  if (typeof window === "undefined") return;
+export async function loadContactSettings(): Promise<ReservationContactSettings> {
+  const payload = await fetchCmsPayload();
+  const settings = payload?.contactSettings;
+  if (!settings || typeof settings !== "object") return getContactSettings();
+  const normalized = { ...defaultContactSettings, ...(settings as Partial<ReservationContactSettings>) };
+  if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEYS.CONTACT_SETTINGS, JSON.stringify(normalized));
+  return normalized;
+}
+
+export async function saveContactSettings(settings: ReservationContactSettings): Promise<void> {
+  if (typeof window === "undefined") throw new Error("Contact settings can only be saved in a browser.");
+  await saveCmsPayloadPatch({ contactSettings: settings });
   localStorage.setItem(STORAGE_KEYS.CONTACT_SETTINGS, JSON.stringify(settings));
   window.dispatchEvent(new CustomEvent("tria_uma_contact_updated", { detail: settings }));
 }
 
-// User Itineraries
-export function getUserItineraries(): CustomItineraryData[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.USER_ITINERARIES);
-    if (!raw) return [];
-    return JSON.parse(raw) as CustomItineraryData[];
-  } catch (e) {
-    console.error("Failed to read user itineraries:", e);
-    return [];
-  }
+function requireCustomerId(userId?: string): Promise<string> {
+  if (userId) return Promise.resolve(userId);
+  return getAuthenticatedUser().then((user) => {
+    if (!user) throw new Error("Please sign in to access your saved profile and itineraries.");
+    return user.id;
+  });
 }
 
-export function getUserItineraryById(id: string): CustomItineraryData | undefined {
-  const all = getUserItineraries();
-  return all.find((item) => item.id === id);
+function readLegacyValue<T>(key: string, fallback: T): T {
+  const raw = localStorage.getItem(key);
+  if (!raw) return fallback;
+  return JSON.parse(raw) as T;
 }
 
-export function saveUserItinerary(itinerary: CustomItineraryData): void {
+export async function migrateLegacyUserData(userId: string): Promise<void> {
   if (typeof window === "undefined") return;
-  const all = getUserItineraries();
-  const existingIdx = all.findIndex((item) => item.id === itinerary.id);
+  const profile = readLegacyValue<UserProfileInfo | null>(STORAGE_KEYS.USER_PROFILE, null);
+  const itineraries = readLegacyValue<CustomItineraryData[]>(STORAGE_KEYS.USER_ITINERARIES, []);
+  const client = getSupabaseClient();
 
-  itinerary.updatedAt = new Date().toISOString();
-
-  if (existingIdx >= 0) {
-    all[existingIdx] = itinerary;
-  } else {
-    all.unshift(itinerary);
+  if (profile) {
+    const { data: currentProfile, error } = await client
+      .from("triauma_customer_profiles")
+      .select("user_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) throw new Error(`Could not check existing customer profile: ${error.message}`);
+    if (!currentProfile) {
+      const { error: saveError } = await client
+        .from("triauma_customer_profiles")
+        .insert({ user_id: userId, data: profile });
+      if (saveError) throw new Error(`Could not migrate your saved profile: ${saveError.message}`);
+    }
   }
 
-  localStorage.setItem(STORAGE_KEYS.USER_ITINERARIES, JSON.stringify(all));
-  window.dispatchEvent(new CustomEvent("tria_uma_itinerary_saved", { detail: itinerary }));
+  if (itineraries.length) {
+    const { error } = await client
+      .from("triauma_customer_itineraries")
+      .upsert(
+        itineraries.map((itinerary) => ({
+          user_id: userId,
+          id: itinerary.id,
+          data: itinerary,
+          created_at: itinerary.createdAt,
+          updated_at: itinerary.updatedAt || itinerary.createdAt,
+        })),
+        { onConflict: "user_id,id", ignoreDuplicates: true },
+      );
+    if (error) throw new Error(`Could not migrate your saved itineraries: ${error.message}`);
+  }
+
+  localStorage.removeItem(STORAGE_KEYS.USER_PROFILE);
+  localStorage.removeItem(STORAGE_KEYS.USER_ITINERARIES);
 }
 
-export function deleteUserItinerary(id: string): void {
-  if (typeof window === "undefined") return;
-  const all = getUserItineraries();
-  const filtered = all.filter((item) => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.USER_ITINERARIES, JSON.stringify(filtered));
+export async function getUserItineraries(userId?: string): Promise<CustomItineraryData[]> {
+  const customerId = await requireCustomerId(userId);
+  const { data, error } = await getSupabaseClient()
+    .from("triauma_customer_itineraries")
+    .select("data")
+    .eq("user_id", customerId)
+    .order("updated_at", { ascending: false });
+  if (error) throw new Error(`Could not load your saved itineraries: ${error.message}`);
+  return (data || []).map((row) => row.data as CustomItineraryData);
+}
+
+export async function getUserItineraryById(id: string, userId?: string): Promise<CustomItineraryData | undefined> {
+  const itineraries = await getUserItineraries(userId);
+  return itineraries.find((item) => item.id === id);
+}
+
+export async function saveUserItinerary(itinerary: CustomItineraryData): Promise<void> {
+  const userId = await requireCustomerId();
+  const updatedAt = new Date().toISOString();
+  const saved = { ...itinerary, updatedAt };
+  const { error } = await getSupabaseClient()
+    .from("triauma_customer_itineraries")
+    .upsert(
+      { user_id: userId, id: saved.id, data: saved, created_at: saved.createdAt, updated_at: updatedAt },
+      { onConflict: "user_id,id" },
+    );
+  if (error) throw new Error(`Could not save your itinerary: ${error.message}`);
+  window.dispatchEvent(new CustomEvent("tria_uma_itinerary_saved", { detail: saved }));
+}
+
+export async function deleteUserItinerary(id: string): Promise<void> {
+  const userId = await requireCustomerId();
+  const { error } = await getSupabaseClient()
+    .from("triauma_customer_itineraries")
+    .delete()
+    .eq("user_id", userId)
+    .eq("id", id);
+  if (error) throw new Error(`Could not delete your itinerary: ${error.message}`);
   window.dispatchEvent(new CustomEvent("tria_uma_itinerary_deleted", { detail: id }));
 }
 
@@ -163,21 +245,25 @@ export interface UserProfileInfo {
   notes?: string;
 }
 
-export function getUserProfile(): UserProfileInfo {
-  if (typeof window === "undefined") {
-    return { name: "", email: "", phone: "" };
-  }
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {
-    // fallback
-  }
-  return { name: "", email: "", phone: "" };
+export async function getUserProfile(userId?: string): Promise<UserProfileInfo> {
+  const customerId = await requireCustomerId(userId);
+  const { data, error } = await getSupabaseClient()
+    .from("triauma_customer_profiles")
+    .select("data")
+    .eq("user_id", customerId)
+    .maybeSingle();
+  if (error) throw new Error(`Could not load your profile: ${error.message}`);
+  return data?.data as UserProfileInfo || { name: "", email: "", phone: "" };
 }
 
-export function saveUserProfile(profile: UserProfileInfo): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
+export async function saveUserProfile(profile: UserProfileInfo): Promise<void> {
+  const userId = await requireCustomerId();
+  const { error } = await getSupabaseClient()
+    .from("triauma_customer_profiles")
+    .upsert(
+      { user_id: userId, data: profile, updated_at: new Date().toISOString() },
+      { onConflict: "user_id" },
+    );
+  if (error) throw new Error(`Could not save your profile: ${error.message}`);
   window.dispatchEvent(new CustomEvent("tria_uma_profile_updated", { detail: profile }));
 }

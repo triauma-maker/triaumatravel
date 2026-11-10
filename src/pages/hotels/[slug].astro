@@ -82,11 +82,12 @@ const currentSlug = Astro.params.slug;
   />
 
   <script define:vars={{ currentSlug }}>
-    import { getSiteContent } from "../../utils/siteContentStorage";
+    import { loadSiteContent } from "../../utils/siteContentStorage";
     import { hydrateHotelFacilities } from "../../utils/hotelFacilities";
     import { hydrateHotelLocationMap } from "../../utils/hotelLocationMap";
 
-    const hotel = getSiteContent().hotels.find((item) => item.slug === currentSlug);
+    const content = await loadSiteContent();
+    const hotel = content.hotels.find((item) => item.slug === currentSlug);
     if (hotel) {
       const image = document.querySelector(".hotel-detail-image") as HTMLImageElement;
       const category = document.querySelector(".hotel-detail-category");

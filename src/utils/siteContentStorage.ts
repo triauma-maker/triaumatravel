@@ -5,6 +5,13 @@ import {
   offers as defaultOffers,
   type TravelItem,
 } from "../data/content";
+import {
+  fetchCmsPayload,
+  isAdminLoggedIn,
+  signInAdmin,
+  signOutAdmin,
+  saveCmsPayloadPatch,
+} from "./cmsBackend";
 
 export interface ExperienceItem {
   id: string;
@@ -235,82 +242,12 @@ export const defaultSiteContent: SiteContentStore = {
 
 export const SITE_STORAGE_KEYS = {
   SITE_CONTENT: "tria_uma_website_content",
-  ADMIN_AUTH: "tria_uma_admin_auth_session",
-  ADMIN_CREDENTIALS: "tria_uma_admin_credentials",
 };
 
-// ========================
-// Authentication Functions
-// ========================
+export { isAdminLoggedIn, signOutAdmin as logoutAdmin };
 
-export interface AdminCredentials {
-  username: string;
-  passwordHash: string;
-}
-
-const DEFAULT_ADMIN_CREDENTIALS: AdminCredentials = {
-  username: "admin",
-  passwordHash: "admin",
-};
-
-export function getAdminCredentials(): AdminCredentials {
-  if (typeof window === "undefined") return DEFAULT_ADMIN_CREDENTIALS;
-  try {
-    const raw = localStorage.getItem(SITE_STORAGE_KEYS.ADMIN_CREDENTIALS);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {
-    // fallback
-  }
-  return DEFAULT_ADMIN_CREDENTIALS;
-}
-
-export function saveAdminCredentials(creds: AdminCredentials): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(SITE_STORAGE_KEYS.ADMIN_CREDENTIALS, JSON.stringify(creds));
-}
-
-export function isAdminLoggedIn(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const session = localStorage.getItem(SITE_STORAGE_KEYS.ADMIN_AUTH);
-    if (!session) return false;
-    const parsed = JSON.parse(session);
-    if (parsed && parsed.authenticated === true) {
-      return true;
-    }
-  } catch (e) {
-    return false;
-  }
-  return false;
-}
-
-export function loginAdmin(usernameInput: string, passwordInput: string): boolean {
-  if (typeof window === "undefined") return false;
-  const creds = getAdminCredentials();
-  
-  const isUserValid = usernameInput.trim().toLowerCase() === creds.username.toLowerCase();
-  const isPassValid =
-    passwordInput === creds.passwordHash ||
-    passwordInput === "admin" ||
-    passwordInput === "triauma2026";
-
-  if (isUserValid && isPassValid) {
-    const sessionData = {
-      authenticated: true,
-      username: usernameInput.trim(),
-      timestamp: new Date().toISOString(),
-    };
-    localStorage.setItem(SITE_STORAGE_KEYS.ADMIN_AUTH, JSON.stringify(sessionData));
-    window.dispatchEvent(new CustomEvent("tria_uma_auth_changed", { detail: sessionData }));
-    return true;
-  }
-  return false;
-}
-
-export function logoutAdmin(): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(SITE_STORAGE_KEYS.ADMIN_AUTH);
-  window.dispatchEvent(new CustomEvent("tria_uma_auth_changed", { detail: { authenticated: false } }));
+export async function loginAdmin(email: string, password: string): Promise<void> {
+  await signInAdmin(email, password);
 }
 
 // ========================
@@ -326,37 +263,48 @@ export function getSiteContent(): SiteContentStore {
     if (!raw) {
       return defaultSiteContent;
     }
-    const parsed = JSON.parse(raw);
-    return {
-      general: { ...defaultSiteContent.general, ...(parsed.general || {}) },
-      hotelsHero: { ...defaultSiteContent.hotelsHero, ...(parsed.hotelsHero || {}) },
-      experienceHero: { ...defaultSiteContent.experienceHero, ...(parsed.experienceHero || {}) },
-      hotels: parsed.hotels?.length ? parsed.hotels : defaultSiteContent.hotels,
-      journal: parsed.journal?.length ? parsed.journal : defaultSiteContent.journal,
-      plans: parsed.plans?.length ? parsed.plans : defaultSiteContent.plans,
-      offers: parsed.offers?.length ? parsed.offers : defaultSiteContent.offers,
-      experiences: parsed.experiences?.length ? parsed.experiences : defaultSiteContent.experiences,
-      events: parsed.events?.length ? parsed.events : defaultSiteContent.events,
-      faqs: parsed.faqs?.length ? parsed.faqs : defaultSiteContent.faqs,
-      about: { ...defaultSiteContent.about, ...(parsed.about || {}) },
-      contact: { ...defaultSiteContent.contact, ...(parsed.contact || {}) },
-    };
+    return normalizeSiteContent(JSON.parse(raw));
   } catch (e) {
     console.error("Failed to load website content from localStorage:", e);
     return defaultSiteContent;
   }
 }
 
-export function saveSiteContent(content: SiteContentStore): void {
-  if (typeof window === "undefined") return;
+function normalizeSiteContent(parsed: Partial<SiteContentStore>): SiteContentStore {
+  return {
+    general: { ...defaultSiteContent.general, ...(parsed.general || {}) },
+    hotelsHero: { ...defaultSiteContent.hotelsHero, ...(parsed.hotelsHero || {}) },
+    experienceHero: { ...defaultSiteContent.experienceHero, ...(parsed.experienceHero || {}) },
+    hotels: parsed.hotels?.length ? parsed.hotels : defaultSiteContent.hotels,
+    journal: parsed.journal?.length ? parsed.journal : defaultSiteContent.journal,
+    plans: parsed.plans?.length ? parsed.plans : defaultSiteContent.plans,
+    offers: parsed.offers?.length ? parsed.offers : defaultSiteContent.offers,
+    experiences: parsed.experiences?.length ? parsed.experiences : defaultSiteContent.experiences,
+    events: parsed.events?.length ? parsed.events : defaultSiteContent.events,
+    faqs: parsed.faqs?.length ? parsed.faqs : defaultSiteContent.faqs,
+    about: { ...defaultSiteContent.about, ...(parsed.about || {}) },
+    contact: { ...defaultSiteContent.contact, ...(parsed.contact || {}) },
+  };
+}
+
+export async function loadSiteContent(): Promise<SiteContentStore> {
+  const payload = await fetchCmsPayload();
+  if (!payload?.siteContent || typeof payload.siteContent !== "object") return getSiteContent();
+  const content = normalizeSiteContent(payload.siteContent as Partial<SiteContentStore>);
+  if (typeof window !== "undefined") {
+    localStorage.setItem(SITE_STORAGE_KEYS.SITE_CONTENT, JSON.stringify(content));
+  }
+  return content;
+}
+
+export async function saveSiteContent(content: SiteContentStore): Promise<void> {
+  if (typeof window === "undefined") throw new Error("Website content can only be saved in a browser.");
+  await saveCmsPayloadPatch({ siteContent: content });
   localStorage.setItem(SITE_STORAGE_KEYS.SITE_CONTENT, JSON.stringify(content));
   window.dispatchEvent(new CustomEvent("tria_uma_site_content_updated", { detail: content }));
 }
 
-export function resetSiteContentToDefault(): SiteContentStore {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem(SITE_STORAGE_KEYS.SITE_CONTENT);
-    window.dispatchEvent(new CustomEvent("tria_uma_site_content_updated", { detail: defaultSiteContent }));
-  }
+export async function resetSiteContentToDefault(): Promise<SiteContentStore> {
+  await saveSiteContent(defaultSiteContent);
   return defaultSiteContent;
 }

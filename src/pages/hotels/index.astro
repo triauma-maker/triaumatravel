@@ -55,13 +55,13 @@ import { hotels } from "../../data/content";
   </section>
 
   <script>
-    import { getSiteContent, SITE_STORAGE_KEYS } from "../../utils/siteContentStorage";
+    import { loadSiteContent, SITE_STORAGE_KEYS } from "../../utils/siteContentStorage";
     import { parseOptimizedVideo } from "../../utils/videoOptimizer";
     import { hydrateHotelFacilities } from "../../utils/hotelFacilities";
     import { hydrateHotelLocationMap } from "../../utils/hotelLocationMap";
 
-    function hydrateHotelsHero() {
-      const { hotelsHero } = getSiteContent();
+    async function hydrateHotelsHero() {
+      const { hotelsHero } = await loadSiteContent();
       const heroMediaWrap = document.getElementById("hero-media-wrap");
       const heroImage = heroMediaWrap?.querySelector<HTMLImageElement>(".hero-image");
       if (!heroMediaWrap) return;
@@ -127,19 +127,22 @@ import { hotels } from "../../data/content";
       heroMediaWrap.appendChild(frame);
     }
 
-    hydrateHotelsHero();
-    window.addEventListener("tria_uma_site_content_updated", hydrateHotelsHero);
+    void hydrateHotelsHero().catch((error: unknown) => console.error("Could not load Hotels page content:", error));
+    window.addEventListener("tria_uma_site_content_updated", () => {
+      void hydrateHotelsHero().catch((error: unknown) => console.error("Could not load Hotels page content:", error));
+    });
     window.addEventListener("storage", (event) => {
       if (event.key === SITE_STORAGE_KEYS.SITE_CONTENT || event.key === null) {
-        hydrateHotelsHero();
+        void hydrateHotelsHero().catch((error: unknown) => console.error("Could not load Hotels page content:", error));
       }
     });
 
     const slug = new URLSearchParams(window.location.search).get("hotel");
     if (slug) {
-      const hotel = getSiteContent().hotels.find((item) => item.slug === slug);
-      const detail = document.getElementById("cms-hotel-detail");
-      if (hotel && detail) {
+      void loadSiteContent().then((content) => {
+        const hotel = content.hotels.find((item) => item.slug === slug);
+        const detail = document.getElementById("cms-hotel-detail");
+        if (!hotel || !detail) return;
         detail.classList.remove("hidden");
         (document.getElementById("cms-hotel-category")!).textContent = hotel.category;
         (document.getElementById("cms-hotel-title")!).textContent = hotel.title;
@@ -173,7 +176,7 @@ import { hotels } from "../../data/content";
           if (locationMap) hydrateHotelLocationMap(locationMap, hotel);
         }
         detail.scrollIntoView({ behavior: "smooth" });
-      }
+      }).catch((error: unknown) => console.error("Could not load hotel details:", error));
     }
   </script>
 </BaseLayout>

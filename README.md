@@ -29,6 +29,8 @@ npm run preview
 
 The admin dashboard stores shared website content and itinerary-builder settings in Supabase. Public pages can read that content; only users listed in `triauma_cms_admins` can change it. Guest profiles and custom itineraries are saved in the visitor's browser and do not require an account. They are available only in the same browser and on the same website origin; they are not synced across devices, private browsing sessions, or after browser storage is cleared.
 
+For instructions on signing in and managing website content, see the [Admin User Guide](./docs/panduan-admin.md).
+
 1. In the Supabase SQL Editor, run `supabase/schema.sql`.
 2. Create or invite the admin account under **Authentication → Users**. Public sign-ups are not needed for guest itineraries and can remain disabled.
 3. Add that user's UUID to the admin allowlist by running this query with the account email:

@@ -46,14 +46,32 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <label class="block text-[10px] uppercase tracking-widest text-forest font-semibold mb-1">
             Password
           </label>
-          <input
-            type="password"
-            id="login-password"
-            required
-            autocomplete="current-password"
-            class="w-full border border-forest/20 p-3 text-xs bg-white focus:outline-none focus:border-forest"
-            placeholder="Password"
-          />
+          <div class="relative">
+            <input
+              type="password"
+              id="login-password"
+              required
+              autocomplete="current-password"
+              class="w-full border border-forest/20 p-3 pr-11 text-xs bg-white focus:outline-none focus:border-forest"
+              placeholder="Password"
+            />
+            <button
+              type="button"
+              id="toggle-login-password"
+              class="absolute inset-y-0 right-0 flex items-center px-3 text-forest/70 hover:text-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-forest"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg class="password-eye-icon h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg class="password-eye-off-icon hidden h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+                <path d="M9.9 5.2A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a15.7 15.7 0 0 1-3.1 3.8M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.5 10.5 0 0 0 5.8-1.8" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <button
@@ -352,8 +370,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   const loginForm = document.getElementById("admin-login-form") as HTMLFormElement;
   const loginEmail = document.getElementById("login-email") as HTMLInputElement;
   const loginPassword = document.getElementById("login-password") as HTMLInputElement;
+  const toggleLoginPassword = document.getElementById("toggle-login-password") as HTMLButtonElement;
   const loginErrorMsg = document.getElementById("login-error-msg")!;
   const btnLogout = document.getElementById("btn-admin-logout")!;
+
+  toggleLoginPassword.addEventListener("click", () => {
+    const showPassword = loginPassword.type === "password";
+    loginPassword.type = showPassword ? "text" : "password";
+    toggleLoginPassword.setAttribute("aria-label", showPassword ? "Hide password" : "Show password");
+    toggleLoginPassword.setAttribute("aria-pressed", String(showPassword));
+    toggleLoginPassword.querySelector(".password-eye-icon")?.classList.toggle("hidden", showPassword);
+    toggleLoginPassword.querySelector(".password-eye-off-icon")?.classList.toggle("hidden", !showPassword);
+  });
 
   // DOM Elements - Navigation
   const sectionBtns = document.querySelectorAll<HTMLButtonElement>(".section-btn");
